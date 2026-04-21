@@ -1,0 +1,18 @@
+<%# Partial: footer.ejs — Links legais e crédito Corpo Digital %>
+<footer class="w-full border-t border-gray-800 mt-auto py-8 px-4">
+  <div class="max-w-2xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <p class="text-gray-500 text-sm">
+      &copy; <%= new Date().getFullYear() %> 2chat. Todos os direitos reservados.
+    </p>
+    <nav class="flex gap-6 text-sm" aria-label="Links legais">
+      <a href="/termos-de-uso"           class="text-gray-400 hover:text-white transition-colors">Termos</a>
+      <a href="/politica-de-privacidade" class="text-gray-400 hover:text-white transition-colors">Privacidade</a>
+    </nav>
+  </div>
+  <p class="text-xs text-gray-600 mt-4 text-center">
+    <a href="https://corpodigital.com.br" target="_blank" rel="noopener noreferrer"
+       class="hover:text-blue-400 transition-colors">
+      by Corpo Digital | Unidade de Performance
+    </a>
+  </p>
+</footer>

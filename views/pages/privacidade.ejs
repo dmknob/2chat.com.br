@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../partials/head', { title, description, canonical, ogTitle, ogDesc }) %>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col"
+      style="background: linear-gradient(135deg,#0a0a0a 0%,#111111 100%); font-family:'Inter',sans-serif;">
+  <%- include('../partials/header') %>
+
+  <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-12">
+    <h1 class="text-3xl font-extrabold text-white mb-8">Política de Privacidade</h1>
+    <div class="prose prose-invert max-w-none text-gray-300 space-y-6">
+
+      <p class="text-gray-400">Última atualização: janeiro de 2026 — em conformidade com a Lei nº 13.709/2018 (LGPD)</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">1. Controlador de Dados</h2>
+      <p><strong>2chat.com.br</strong> é o controlador dos dados pessoais coletados através desta plataforma.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">2. Dados Coletados</h2>
+      <h3 class="text-lg font-semibold text-gray-200 mt-4">2.1. Formulários de Qualificação (parceiros)</h3>
+      <ul class="list-disc list-inside space-y-2">
+        <li><strong>Respostas do formulário</strong>: dados fornecidos voluntariamente (ex: cidade, período, finalidade).</li>
+        <li><strong>Localização aproximada</strong>: cidade, estado e país inferidos do IP via serviço Cloudflare (não é PII individual).</li>
+        <li><strong>Identificador de sessão</strong>: hash SHA-256 do endereço IP com salt — pseudonimizado, não permite identificação direta.</li>
+      </ul>
+      <h3 class="text-lg font-semibold text-gray-200 mt-4">2.2. Lista de Espera (waitlist)</h3>
+      <ul class="list-disc list-inside space-y-2">
+        <li><strong>E-mail</strong>: coletado com consentimento explícito para comunicação sobre o beta do 2chat.</li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-white mt-8">3. Finalidade e Base Legal</h2>
+      <table class="w-full text-sm border-collapse mt-2">
+        <thead>
+          <tr class="border-b border-gray-700 text-gray-400">
+            <th class="text-left py-2 pr-4">Dado</th>
+            <th class="text-left py-2 pr-4">Finalidade</th>
+            <th class="text-left py-2">Base Legal (LGPD)</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-800">
+          <tr>
+            <td class="py-2 pr-4">Respostas do formulário</td>
+            <td class="py-2 pr-4">Qualificar o atendimento via WhatsApp</td>
+            <td class="py-2">Legítimo interesse do parceiro</td>
+          </tr>
+          <tr>
+            <td class="py-2 pr-4">Localização aproximada</td>
+            <td class="py-2 pr-4">Analytics agregado para o parceiro</td>
+            <td class="py-2">Legítimo interesse</td>
+          </tr>
+          <tr>
+            <td class="py-2 pr-4">Hash de IP</td>
+            <td class="py-2 pr-4">Segurança e prevenção de fraude</td>
+            <td class="py-2">Legítimo interesse</td>
+          </tr>
+          <tr>
+            <td class="py-2 pr-4">E-mail (waitlist)</td>
+            <td class="py-2 pr-4">Comunicação sobre o produto</td>
+            <td class="py-2">Consentimento</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="text-xl font-bold text-white mt-8">4. Retenção de Dados</h2>
+      <ul class="list-disc list-inside space-y-2">
+        <li>Leads de formulários: retidos por <strong>24 meses</strong> para análise do parceiro.</li>
+        <li>Hashes de IP: retidos por <strong>90 dias</strong> (após esse período, são irrecuperáveis).</li>
+        <li>E-mails da waitlist: retidos até solicitação de remoção ou encerramento do programa beta.</li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-white mt-8">5. Compartilhamento</h2>
+      <p>Os dados dos formulários são compartilhados <strong>exclusivamente</strong> com o parceiro responsável
+         pelo formulário, via redirecionamento ao WhatsApp. Não vendemos dados a terceiros.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">6. Seus Direitos (LGPD)</h2>
+      <ul class="list-disc list-inside space-y-2">
+        <li>Acesso, correção ou exclusão dos seus dados</li>
+        <li>Revogação do consentimento (e-mails da waitlist)</li>
+        <li>Portabilidade dos dados</li>
+        <li>Informação sobre compartilhamento</li>
+      </ul>
+      <p>Para exercer seus direitos: <a href="mailto:privacidade@2chat.com.br" class="text-blue-400 hover:underline">privacidade@2chat.com.br</a></p>
+
+      <h2 class="text-xl font-bold text-white mt-8">7. Cookies</h2>
+      <p>Utilizamos apenas cookies analíticos (com consentimento) e cookies de sessão para o banner de aviso.
+         Não utilizamos cookies de rastreamento cross-site.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">8. Contato do DPO</h2>
+      <p>Encarregado de Proteção de Dados: <a href="mailto:privacidade@2chat.com.br" class="text-blue-400 hover:underline">privacidade@2chat.com.br</a></p>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <%- include('../partials/cookie-banner') %>
+</body>
+</html>

@@ -1,0 +1,44 @@
+name            = "2chat-worker"
+main            = "worker.js"
+compatibility_date = "2024-09-23"
+
+# ===========================================================
+# PREENCHA ESTES VALORES ANTES DO PRIMEIRO DEPLOY
+# ===========================================================
+
+# Seu Account ID: rode `wrangler whoami` para obter
+account_id = "f4a1d49a3508607cd86b7f8bbf956a55"
+
+# ===========================================================
+# KV Namespaces
+# ===========================================================
+
+# LEADS_KV: buffer de leads quando o VPS está offline
+# Criar com: wrangler kv:namespace create "LEADS_KV"
+# Depois cole o id retornado abaixo:
+[[kv_namespaces]]
+binding    = "2CHAT_LEADS_KV"
+id         = "3408aa729e1e40e497db872ad9380905"
+# preview_id = "COLE_O_PREVIEW_ID_AQUI"  # descomente se usar wrangler dev
+
+# TENANTS_KV: configuração de tenants (ativar na v1)
+# [[kv_namespaces]]
+# binding    = "_2CHAT_TENANTS_KV"
+# id         = "c3e1daa6cec446b5bc6c2b58353abc16"
+
+# ===========================================================
+# Rotas: Worker intercepta TUDO em 2chat.com.br/*
+# O pass-through para o VPS é gerenciado dentro do worker.js
+# ===========================================================
+
+[[routes]]
+pattern   = "2chat.com.br/*"
+zone_name = "2chat.com.br"
+
+# ===========================================================
+# Variáveis de ambiente (não-secretas)
+# ===========================================================
+
+[vars]
+ENVIRONMENT    = "production"
+WORKER_VERSION = "v0"

@@ -1,0 +1,55 @@
+# =============================================================================
+# 2chat.com.br — .gitignore (repositório público)
+# =============================================================================
+
+# ─── Ambiente e Segredos ─────────────────────────────────────────
+# NUNCA versionar — contém tokens, senhas, CF_API_TOKEN
+.env
+.env.local
+.env.*.local
+
+# ─── Banco de Dados ───────────────────────────────────────────────
+# Padrão: *.db cobre dev, prod e qualquer ambiente futuro
+*.db
+*.db-shm
+*.db-wal
+
+# ─── Dependências ──────────────────────────────────────────────────
+node_modules/
+
+# ─── Build/Compilados ──────────────────────────────────────────────
+# CSS compilado pelo Tailwind (gerado pelo: npm run build:css)
+# VPS precisa rodar build:css após git pull
+public/css/style.css
+
+# Pasta dist legada (build anterior ao Express)
+dist/
+
+# ─── Cloudflare Wrangler (cache local) ─────────────────────────────
+.wrangler/
+worker/.wrangler/
+
+# ─── Logs ──────────────────────────────────────────────────────────
+logs/
+*.log
+npm-debug.log*
+
+# ─── Temporários e Backups ─────────────────────────────────────────
+# Pasta de backup criada durante a migração HTML → EJS
+public/_backup_html/
+
+# Páginas HTML estáticas legadas (substituídas por views EJS)
+# Mantidas como referência local, não devem ir para o repo
+public/politica-de-privacidade/
+public/termos-de-uso/
+public/zebra-box/
+
+# ─── macOS ─────────────────────────────────────────────────────────
+.DS_Store
+**/.DS_Store
+
+# ─── IDEs ──────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo

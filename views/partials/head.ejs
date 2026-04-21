@@ -1,0 +1,74 @@
+<%#
+  Partial: head.ejs
+  Parâmetros esperados: title, description, canonical, ogTitle, ogDesc (todos via controller)
+  inlineCSS e BASE_URL vêm de app.locals (disponíveis em todos templates)
+  SEO stack completo para páginas institucionais (index, follow)
+%>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<%# === SEO BÁSICO === %>
+<title><%= title %></title>
+<meta name="description" content="<%= description %>">
+<link rel="canonical" href="<%= BASE_URL %><%= canonical %>">
+<meta name="robots" content="index, follow">
+
+<%# === OPEN GRAPH (Facebook, WhatsApp, LinkedIn) === %>
+<meta property="og:title"       content="<%= ogTitle || title %>">
+<meta property="og:description" content="<%= ogDesc  || description %>">
+<meta property="og:image"       content="<%= BASE_URL %>/img/og-image.png">
+<meta property="og:url"         content="<%= BASE_URL %><%= canonical %>">
+<meta property="og:type"        content="website">
+<meta property="og:locale"      content="pt_BR">
+<meta property="og:site_name"   content="2chat">
+
+<%# === TWITTER CARD === %>
+<meta name="twitter:card"        content="summary_large_image">
+<meta name="twitter:title"       content="<%= ogTitle || title %>">
+<meta name="twitter:description" content="<%= ogDesc  || description %>">
+<meta name="twitter:image"       content="<%= BASE_URL %>/img/og-image.png">
+
+<%# === SCHEMA.ORG (apenas na home) — injetado pelo controller quando necessário === %>
+<% if (locals.schemaJson) { %>
+<script type="application/ld+json"><%- schemaJson %></script>
+<% } %>
+
+<%# === FONTES: Inter (Google Fonts) — preconnect para reduzir latência === %>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+<%# === CSS EMBUTIDO (Tailwind compilado + minificado) === %>
+<%# inlineCSS é lido do arquivo public/css/style.css no boot do app (app.js) %>
+<% if (inlineCSS) { %>
+<style><%- inlineCSS %></style>
+<% } else { %>
+<%# Fallback em dev antes do primeiro build:css %>
+<link rel="stylesheet" href="/css/style.css">
+<% } %>
+
+<%# === ANALYTICS (padrão Corpo Digital §2.3: carregamento adiado por interacao) === %>
+<% if (GA_ID && GA_ID !== 'G-XXXXXXXXXX') { %>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    let _gtagLoaded = false;
+    function _loadGtag() {
+        if (_gtagLoaded) return;
+        _gtagLoaded = true;
+        const s = document.createElement('script');
+        s.src   = 'https://www.googletagmanager.com/gtag/js?id=<%= GA_ID %>';
+        s.async = true;
+        document.head.appendChild(s);
+        gtag('config', '<%= GA_ID %>', { page_path: window.location.pathname });
+        ['scroll','mousemove','touchstart','click','keydown'].forEach(e =>
+            window.removeEventListener(e, _loadGtag)
+        );
+    }
+    ['scroll','mousemove','touchstart','click','keydown'].forEach(e =>
+        window.addEventListener(e, _loadGtag, { passive: true, once: true })
+    );
+    setTimeout(_loadGtag, 5000); // Fallback: 5 segundos
+</script>
+<% } %>

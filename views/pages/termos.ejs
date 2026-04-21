@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../partials/head', { title, description, canonical, ogTitle, ogDesc }) %>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col"
+      style="background: linear-gradient(135deg,#0a0a0a 0%,#111111 100%); font-family:'Inter',sans-serif;">
+  <%- include('../partials/header') %>
+
+  <main class="flex-1 max-w-2xl mx-auto w-full px-4 py-12">
+    <h1 class="text-3xl font-extrabold text-white mb-8">Termos de Uso</h1>
+    <div class="prose prose-invert max-w-none text-gray-300 space-y-6">
+
+      <p class="text-gray-400">Última atualização: janeiro de 2026</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">1. Aceitação dos Termos</h2>
+      <p>Ao acessar ou usar os serviços do <strong>2chat.com.br</strong>, você concorda com estes termos. Se
+         não concordar com qualquer parte, não use o serviço.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">2. Descrição do Serviço</h2>
+      <p>O 2chat é uma plataforma de qualificação de leads via formulários inteligentes, com redirecionamento
+         para WhatsApp. O serviço atua como intermediário entre visitantes e parceiros cadastrados.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">3. Uso Aceitável</h2>
+      <ul class="list-disc list-inside space-y-2">
+        <li>O serviço deve ser usado apenas para fins legítimos de atendimento ao cliente.</li>
+        <li>É proibido usar automações, bots ou scripts para gerar acessos ou leads falsos.</li>
+        <li>O conteúdo dos formulários não pode violar direitos de terceiros ou a legislação brasileira.</li>
+      </ul>
+
+      <h2 class="text-xl font-bold text-white mt-8">4. Responsabilidade</h2>
+      <p>O 2chat não se responsabiliza pelo conteúdo das conversas iniciadas pelo WhatsApp após o
+         redirecionamento, nem pelas informações prestadas pelos parceiros em seus formulários.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">5. Privacidade</h2>
+      <p>O tratamento de dados é regido pela nossa
+         <a href="/politica-de-privacidade" class="text-blue-400 hover:underline">Política de Privacidade</a>,
+         em conformidade com a LGPD (Lei nº 13.709/2018).</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">6. Alterações</h2>
+      <p>Podemos atualizar estes termos a qualquer momento. O uso continuado do serviço após alterações
+         constitui aceitação das mudanças.</p>
+
+      <h2 class="text-xl font-bold text-white mt-8">7. Contato</h2>
+      <p>Dúvidas sobre estes termos: <a href="mailto:contato@2chat.com.br" class="text-blue-400 hover:underline">contato@2chat.com.br</a></p>
+    </div>
+  </main>
+
+  <%- include('../partials/footer') %>
+  <%- include('../partials/cookie-banner') %>
+</body>
+</html>

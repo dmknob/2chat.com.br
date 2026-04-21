@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../partials/head', {
+    title, description, canonical, ogTitle, ogDesc,
+    schemaJson: JSON.stringify({
+      "@context":           "https://schema.org",
+      "@type":              "SoftwareApplication",
+      "name":               "2chat",
+      "url":                BASE_URL,
+      "applicationCategory":"BusinessApplication",
+      "description":        description,
+      "operatingSystem":    "Web",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
+    })
+  }) %>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .glass-card {
+      background: rgba(17,17,17,0.8);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(55,55,55,0.3);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+    .floating { animation: float 6s ease-in-out infinite; }
+    @keyframes pulse-glow {
+      from { box-shadow: 0 0 20px rgba(0,102,255,0.3); }
+      to   { box-shadow: 0 0 30px rgba(0,102,255,0.5); }
+    }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite alternate; }
+    .hover-lift { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
+    .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+  </style>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col justify-center items-center px-4 py-8">
+
+  <%# Header simplificado para a landing (logo apenas) %>
+  <header class="w-full max-w-md mx-auto mb-12 text-center">
+    <h1 class="text-5xl md:text-6xl font-extrabold gradient-text mb-4 tracking-tight floating">
+      2chat<span class="text-blue-500">.</span>
+    </h1>
+    <p class="text-gray-400 text-lg md:text-xl leading-relaxed">
+      A inteligência entre o seu link e a sua conversa.
+    </p>
+  </header>
+
+  <main class="max-w-md w-full space-y-8" id="main-content">
+
+    <%# Hero Card %>
+    <section class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl hover-lift pulse-glow"
+             aria-label="Proposta de valor">
+      <div class="text-center space-y-6">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-full mb-4"
+             aria-hidden="true">
+          <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
+          Qualifique leads em tempo real
+        </h2>
+        <p class="text-gray-300 text-base md:text-lg leading-relaxed">
+          Automatize a triagem, crie links inteligentes e converta
+          mais no WhatsApp com formulários de qualificação em segundos.
+        </p>
+      </div>
+    </section>
+
+    <%# Waitlist Form %>
+    <section class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl hover-lift"
+             aria-label="Entrar na lista de espera do beta">
+      <div class="text-center space-y-6">
+        <h2 class="text-xl md:text-2xl font-semibold text-white mb-2">
+          🚀 Junte-se ao Beta
+        </h2>
+        <p class="text-gray-400 text-sm md:text-base leading-relaxed">
+          Seja um dos primeiros a testar a revolução na qualificação de leads.
+        </p>
+
+        <form id="betaForm" class="space-y-6" novalidate>
+          <div class="space-y-2 text-left">
+            <label for="betaEmail" class="block text-sm font-medium text-gray-300">
+              Seu melhor e-mail
+            </label>
+            <input type="email" id="betaEmail" name="email"
+                   placeholder="exemplo@email.com" required autocomplete="email"
+                   class="w-full bg-gray-950/50 border border-gray-700 text-white p-4 rounded-xl
+                          focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
+                          transition-all duration-300 placeholder-gray-500 hover:border-gray-600">
+          </div>
+
+          <%# Honeypot — invisível para humanos, armadilha para bots %>
+          <input type="text" name="honeypot"
+                 style="position:absolute;left:-9999px;opacity:0;pointer-events:none"
+                 tabindex="-1" autocomplete="off" aria-hidden="true">
+
+          <button type="submit" id="betaSubmit"
+                  class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700
+                         text-white font-bold p-4 rounded-xl transition-all duration-300
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900
+                         disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95">
+            <span class="flex items-center justify-center gap-2">
+              <span>Entrar na lista de espera</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+              </svg>
+            </span>
+          </button>
+        </form>
+
+        <div id="betaMsg" class="hidden p-4 rounded-xl border text-sm font-medium" role="alert"></div>
+      </div>
+    </section>
+
+    <%# Features Grid %>
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4" aria-label="Diferenciais">
+      <article class="glass-card rounded-2xl p-6 text-center hover-lift">
+        <div class="inline-flex items-center justify-center w-12 h-12 bg-green-500/20 rounded-full mb-4">
+          <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-white mb-2">Resiliente</h3>
+        <p class="text-gray-400 text-sm">Nunca perde um lead, mesmo se o servidor cair.</p>
+      </article>
+
+      <article class="glass-card rounded-2xl p-6 text-center hover-lift">
+        <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full mb-4">
+          <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-white mb-2">Rápido</h3>
+        <p class="text-gray-400 text-sm">Qualificação em segundos, direto no WhatsApp.</p>
+      </article>
+
+      <article class="glass-card rounded-2xl p-6 text-center hover-lift">
+        <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-full mb-4">
+          <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-white mb-2">Inteligente</h3>
+        <p class="text-gray-400 text-sm">Dados qualificados chegam organizados.</p>
+      </article>
+    </section>
+
+  </main>
+
+  <%- include('../partials/footer') %>
+  <%- include('../partials/cookie-banner') %>
+
+  <%# Modal de sucesso da waitlist %>
+  <div id="successModal"
+       class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden"
+       role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="bg-gray-900 border border-gray-700 p-8 rounded-3xl max-w-sm mx-4 text-center shadow-2xl">
+      <div class="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-6"
+           aria-hidden="true">
+        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+      </div>
+      <h2 id="modalTitle" class="text-2xl font-bold text-white mb-4">Obrigado!</h2>
+      <p class="text-gray-300 mb-6 leading-relaxed">
+        Você está na lista. Entraremos em contato em breve com novidades sobre o Beta do 2chat.
+      </p>
+      <button id="modalClose"
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all">
+        Entendi
+      </button>
+    </div>
+  </div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>
