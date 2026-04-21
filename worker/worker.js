@@ -17,14 +17,14 @@ const TENANTS = {
     name: "Zebra Box",
     whatsapp: "5551993668728",
     forms: {
-      "form01": {
-        id: "form01",
+      "container": {  // Alinhado com o slug do banco (seed)
+        id: "container",
         title: "Solicite aluguel de um Container",
         description: "Responda 3 perguntas rápidas e fale com o especialista.",
         fields: [
           {
             id: "location",
-            label: "Qual a sua cidade?",
+            label: "Para qual cidade?",
             type: "text",
             placeholder: "Ex: Porto Alegre",
             required: true,
@@ -44,13 +44,13 @@ const TENANTS = {
             required: true,
           },
         ],
-        // {{campo}} será substituído pelo valor escolhido pelo usuário
         message_template:
           "Olá! Vim pelo 2chat. Tenho interesse em container para {{purpose}} em {{location}} por {{period}}.",
       },
     },
   },
 };
+
 
 // ─── ROTAS DE PASS-THROUGH → VPS/Nginx ────────────────────────────────────────
 // Qualquer URL que corresponda a esses padrões será repassada direto ao VPS.
