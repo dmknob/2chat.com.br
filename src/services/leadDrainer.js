@@ -25,6 +25,10 @@ async function drainLeadsFromKV() {
         });
 
         if (!listRes.ok) {
+            if (listRes.status === 429) {
+                logger.warn('Drainer KV: Cloudflare Rate Limit (429) na listagem. Abortando.');
+                return;
+            }
             throw new Error(`CF List falhou: ${listRes.status} ${await listRes.text()}`);
         }
 
@@ -49,6 +53,10 @@ async function drainLeadsFromKV() {
             });
 
             if (!itemRes.ok) {
+                if (itemRes.status === 429) {
+                    logger.warn('Drainer KV: Cloudflare Rate Limit (429) atingido. Interrompendo batch atual.');
+                    break;
+                }
                 logger.error(`Drainer KV: Erro ao puxar lead ${keyName}. Status: ${itemRes.status}`);
                 continue;
             }
@@ -60,13 +68,14 @@ async function drainLeadsFromKV() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-2chat-Source': 'worker-v0' // Bypass simples no bloqueador do apiController
+                    'X-2chat-Source': 'worker-v0'
                 },
                 body: JSON.stringify(leadData)
             });
 
             if (!intRes.ok) {
-                logger.error(`Drainer KV: Injeção falhou para ${keyName}. Status: ${intRes.status}`);
+                const errBody = await intRes.text();
+                logger.error(`Drainer KV: Injeção falhou para ${keyName}. Status: ${intRes.status} | Erro: ${errBody}`);
                 continue;
             }
 
@@ -81,6 +90,9 @@ async function drainLeadsFromKV() {
             } else {
                 logger.warn(`Drainer KV: Falha ao deletar ${keyName} após resgate.`);
             }
+
+            // Delay de segurança para não atropelar o SQLite e evitar rate limit da Cloudflare no próximo item
+            await new Promise(resolve => setTimeout(resolve, 500));
         }
     } catch (err) {
         logger.error('Drainer KV: Erro geral na drenagem', { error: err.message });

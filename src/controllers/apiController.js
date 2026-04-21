@@ -76,8 +76,9 @@ exports.postLead = (req, res) => {
         return res.status(403).json({ error: 'Origem não autorizada.' });
     }
 
-    const {
+    let {
         parceiro,
+        tenant,
         form_id,
         payload_json,
         ip_hash,
@@ -87,9 +88,15 @@ exports.postLead = (req, res) => {
         created_at,
     } = req.body || {};
 
+    // Fallback para leads legados (pós-refactor de tenant para parceiro)
+    if (!parceiro && tenant) parceiro = tenant;
+
     // Valida campos obrigatórios
     if (!parceiro || !form_id || !payload_json) {
-        return res.status(400).json({ error: 'Campos obrigatórios ausentes: parceiro, form_id, payload_json' });
+        return res.status(400).json({ 
+            error: 'Campos obrigatórios ausentes: parceiro, form_id, payload_json',
+            received: { parceiro, tenant, form_id, has_payload: !!payload_json }
+        });
     }
 
     try {
