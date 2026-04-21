@@ -52,26 +52,46 @@ async function publishParceiroToKV(slug) {
         ])),
     };
 
-    // Publica no KV via API REST da Cloudflare
-    // Chave: "parceiro:{slug}" — prefixo evita colisão com outras chaves futuras
+    // Publica no KV via API REST da Cloudflare com Retry Linear (anti-429)
     const kvUrl = [
         `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}`,
         `/storage/kv/namespaces/${KV_TENANTS_NS_ID}`,
         `/values/parceiro:${slug}`,
     ].join('');
 
-    const res = await fetch(kvUrl, {
-        method:  'PUT',
-        headers: {
-            'Authorization': `Bearer ${CF_API_TOKEN}`,
-            'Content-Type':  'application/json',
-        },
-        body: JSON.stringify(kvConfig),
-    });
+    let res;
+    let retries = 3;
+    let delayMs = 1500;
+
+    while (retries > 0) {
+        res = await fetch(kvUrl, {
+            method:  'PUT',
+            headers: {
+                'Authorization': `Bearer ${CF_API_TOKEN}`,
+                'Content-Type':  'application/json',
+            },
+            body: JSON.stringify(kvConfig),
+        });
+
+        if (res.ok) break;
+
+        if (res.status === 429) {
+            logger.warn(`KV Sync Rate Limited (429) para '${slug}'. Retentando em ${delayMs}ms...`);
+            await new Promise(resolve => setTimeout(resolve, delayMs));
+            retries--;
+            delayMs *= 2; // backoff exponencial simples (1.5s, 3s, 6s)
+        } else {
+            // Em caso de 400, 401 ou 500, não retentamos e abortamos imediatamente
+            break;
+        }
+    }
 
     if (!res.ok) {
-        const body = await res.text();
-        throw new Error(`Cloudflare KV API respondeu ${res.status}: ${body}`);
+        const bodyText = await res.text();
+        if (res.status === 429) {
+             throw new Error(`Cloudflare Rate Limit (Erro 1015). Limite global da sua conta Cloudflare estourou. Os dados foram salvos no banco local SQLite, mas a sincronia falhou. Aguarde 5 minutos e edite o parceiro para retentar.`);
+        }
+        throw new Error(`Cloudflare KV API respondeu ${res.status}: ${bodyText.substring(0, 150)}...`);
     }
 
     logger.info(`☁️  Parceiro '${slug}' publicado no KV (${forms.length} form(s))`);
