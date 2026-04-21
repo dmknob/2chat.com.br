@@ -1,9 +1,9 @@
 /**
  * 2chat.com.br — Cloudflare Worker v0
- * Tenant: Zebra Box (hardcoded)
+ * Parceiro: Zebra Box (hardcoded)
  *
  * Fluxo:
- *   GET  /{slug}           → Renderiza hub do tenant (lista de formulários)
+ *   GET  /{slug}           → Renderiza hub do parceiro (lista de formulários)
  *   GET  /{slug}/{form-id} → Renderiza formulário de qualificação
  *   POST /{slug}/{form-id} → Processa submit: valida → log → redirect WhatsApp
  *   *                      → Pass-through para o VPS/Nginx (landing, /api, estáticos)
@@ -11,7 +11,7 @@
 
 // ─── CONFIGURAÇÃO v0 — ZEBRA BOX HARDCODED ────────────────────────────────────
 
-const TENANTS = {
+const PARCEIROS = {
   "zebra-box": {
     slug: "zebra-box",
     name: "Zebra Box",
@@ -80,7 +80,7 @@ export default {
       }
     }
 
-    // 2. Parse da rota de tenant: /{slug} ou /{slug}/{form-id}
+    // 2. Parse da rota de parceiro: /{slug} ou /{slug}/{form-id}
     const parts = pathname.split("/").filter(Boolean);
     const slug = parts[0];
     const formId = parts[1]; // undefined se apenas /{slug}
@@ -90,56 +90,55 @@ export default {
       return fetch(request);
     }
 
-    // 3. Carregar config do tenant (v0: hardcoded | v1: KV)
-    const tenant = await getTenantConfig(slug, env);
-    if (!tenant) {
-      return fetch(request); // Tenant não encontrado → VPS decide (ex: 404 personalizado)
+    // 3. Carregar config do parceiro (v0: hardcoded | v1: KV)
+    const parceiro = await getParceiroConfig(slug, env);
+    if (!parceiro) {
+      return fetch(request); // Parceiro não encontrado → VPS decide (ex: 404 personalizado)
     }
 
-    // 4. GET /{slug} → Hub do tenant
+    // 4. GET /{slug} → Hub do parceiro
     if (!formId && request.method === "GET") {
-      return renderHub(tenant);
+      return renderHub(parceiro);
     }
 
     // 5. GET /{slug}/{form-id} → Formulário
     if (formId && request.method === "GET") {
-      const form = tenant.forms[formId];
+      const form = parceiro.forms[formId];
       if (!form) return new Response("Formulário não encontrado.", { status: 404 });
-      return renderForm(tenant, form);
+      return renderForm(parceiro, form);
     }
 
     // 6. POST /{slug}/{form-id} → Submit do formulário
     if (formId && request.method === "POST") {
-      const form = tenant.forms[formId];
+      const form = parceiro.forms[formId];
       if (!form) return new Response("Not Found", { status: 404 });
-      return handleSubmit(request, tenant, form, env, ctx);
+      return handleSubmit(request, parceiro, form, env, ctx);
     }
 
     return fetch(request);
   },
 };
 
-// ─── TENANT CONFIG ────────────────────────────────────────────────────────────
+// ─── PARCEIRO CONFIG ────────────────────────────────────────────────────────────
 
-async function getTenantConfig(slug, env) {
-  // v1: Lê config do Cloudflare KV (TENANTS_KV) → chave = "tenant:{slug}"
-  // Descomentar após criar o namespace e adicionar ao wrangler.toml
-  // if (env?.TENANTS_KV) {
-  //   try {
-  //     const config = await env.TENANTS_KV.get(`tenant:${slug}`, { type: "json" });
-  //     if (config) return config; // KV tem prioridade sobre hardcoded
-  //   } catch {
-  //     // KV indisponível — cai no fallback abaixo
-  //   }
-  // }
+async function getParceiroConfig(slug, env) {
+  // v1: Lê config do Cloudflare KV (TENANTS_KV) → chave = "parceiro:{slug}"
+  if (env?.TENANTS_KV) {
+    try {
+      const config = await env.TENANTS_KV.get(`parceiro:${slug}`, { type: "json" });
+      if (config) return config; // KV tem prioridade sobre hardcoded
+    } catch {
+      // KV indisponível — cai no fallback abaixo
+    }
+  }
 
   // v0 fallback: configuração hardcoded (Zebra Box)
-  return TENANTS[slug] || null;
+  return PARCEIROS[slug] || null;
 }
 
 // ─── HANDLER DE SUBMIT ────────────────────────────────────────────────────────
 
-async function handleSubmit(request, tenant, form, env, ctx) {
+async function handleSubmit(request, parceiro, form, env, ctx) {
   const contentType = request.headers.get("Content-Type") || "";
 
   // Suporte a application/x-www-form-urlencoded (submit nativo HTML)
@@ -157,7 +156,7 @@ async function handleSubmit(request, tenant, form, env, ctx) {
   // Honeypot anti-bot: campo "website" deve estar vazio
   if (getValue("website")?.trim()) {
     // Bot detectado — redirect silencioso, sem registrar
-    return Response.redirect(`https://wa.me/${tenant.whatsapp}`, 302);
+    return Response.redirect(`https://wa.me/${parceiro.whatsapp}`, 302);
   }
 
   // Validação dos campos obrigatórios
@@ -173,7 +172,7 @@ async function handleSubmit(request, tenant, form, env, ctx) {
     for (const field of form.fields) {
       values[field.id] = getValue(field.id);
     }
-    return renderForm(tenant, form, {
+    return renderForm(parceiro, form, {
       error: `Por favor, preencha: ${errors.join(", ")}.`,
       values,
     });
@@ -187,7 +186,7 @@ async function handleSubmit(request, tenant, form, env, ctx) {
 
   // Montar mensagem e URL do WhatsApp
   const message = renderTemplate(form.message_template, payload);
-  const waUrl = `https://wa.me/${tenant.whatsapp}?text=${encodeURIComponent(message)}`;
+  const waUrl = `https://wa.me/${parceiro.whatsapp}?text=${encodeURIComponent(message)}`;
 
   // ─── GEOCODING + PSEUDONIMIZAÇÃO (LGPD) ──────────────────────────────────────
   // ORDEM OBRIGATÓRIA para conformidade com LGPD:
@@ -203,7 +202,7 @@ async function handleSubmit(request, tenant, form, env, ctx) {
   // ─────────────────────────────────────────────────────────────────────────────
 
   const leadData = {
-    tenant:       tenant.slug,
+    parceiro:     parceiro.slug,
     form_id:      form.id,
     payload_json: JSON.stringify(payload),
     ip_hash,      // pseudonimizado — raw IP descartado
@@ -233,7 +232,7 @@ async function logLead(leadData, env) {
     const controller = new AbortController();
     const timerId = setTimeout(() => controller.abort(), 400);
 
-    const response = await fetch(VPS_ENDPOINT, {
+    const response = await fetch(API_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -259,10 +258,6 @@ async function logLead(leadData, env) {
       await env['2CHAT_LEADS_KV'].put(kvKey, JSON.stringify(leadData), {
         expirationTtl: 60 * 60 * 24 * 7, // TTL: 7 dias (auto-expiração)
       });
-      // ✅ Lead inclui city/region/country mesmo no buffer
-      // v0: drenar manualmente:
-      //   wrangler kv:key list --namespace-id=3408aa729e1e40e497db872ad9380905 --prefix=lead:
-      // v1: cron automático no VPS drena para SQLite
     }
   }
 }
@@ -428,11 +423,11 @@ function baseLayout({ title, metaDesc, content, backHref = null, backLabel = nul
 
 // ─── RENDERIZADORES ───────────────────────────────────────────────────────────
 
-function renderHub(tenant) {
-  const formCards = Object.values(tenant.forms)
+function renderHub(parceiro) {
+  const formCards = Object.values(parceiro.forms)
     .map(
       (form) => `
-      <a href="/${tenant.slug}/${form.id}"
+      <a href="/${parceiro.slug}/${form.id}"
          class="card-form block border border-gray-800 rounded-2xl p-5 group flex flex-col gap-1 transition-all">
         <h2 class="text-base font-semibold text-white group-hover:text-blue-400 transition-all">
           ${form.title}
@@ -445,7 +440,7 @@ function renderHub(tenant) {
 
   const content = `
     <div class="mb-7">
-      <h1 class="text-2xl font-extrabold text-white mb-1">${tenant.name}</h1>
+      <h1 class="text-2xl font-extrabold text-white mb-1">${parceiro.name}</h1>
       <p class="text-sm text-gray-400">Selecione o atendimento que você precisa:</p>
     </div>
     <div class="flex flex-col gap-4">
@@ -454,15 +449,15 @@ function renderHub(tenant) {
 
   return new Response(
     baseLayout({
-      title: tenant.name,
-      metaDesc: `Formulários de atendimento – ${tenant.name}`,
+      title: parceiro.name,
+      metaDesc: `Formulários de atendimento – ${parceiro.name}`,
       content,
     }),
     { headers: { "Content-Type": "text/html;charset=UTF-8" } }
   );
 }
 
-function renderForm(tenant, form, { error = null, values = {} } = {}) {
+function renderForm(parceiro, form, { error = null, values = {} } = {}) {
   const fieldClass = "field-ctrl w-full border border-gray-700 text-white p-3 rounded-xl transition-all text-sm";
 
   const fieldHtml = form.fields
@@ -491,7 +486,7 @@ function renderForm(tenant, form, { error = null, values = {} } = {}) {
       <h1 class="text-xl font-bold text-white mb-1">${form.title}</h1>
       <p class="text-sm text-gray-400">${form.description}</p>
     </div>
-    <form method="POST" action="/${tenant.slug}/${form.id}" class="flex flex-col gap-4" novalidate>
+    <form method="POST" action="/${parceiro.slug}/${form.id}" class="flex flex-col gap-4" novalidate>
       ${errorBanner}
       ${fieldHtml}
 
@@ -516,8 +511,8 @@ function renderForm(tenant, form, { error = null, values = {} } = {}) {
       title: form.title,
       metaDesc: form.description,
       content,
-      backHref: `/${tenant.slug}`,
-      backLabel: tenant.name,
+      backHref: `/${parceiro.slug}`,
+      backLabel: parceiro.name,
     }),
     { headers: { "Content-Type": "text/html;charset=UTF-8" } }
   );

@@ -1,5 +1,5 @@
 // scripts/seed-zebra-box.js
-// Popula o banco com o tenant Zebra Box (MVP v0)
+// Popula o banco com o parceiro Zebra Box (MVP v0)
 // Uso: node scripts/seed-zebra-box.js
 require('dotenv').config();
 const db = require('../database/db');
@@ -7,22 +7,22 @@ const db = require('../database/db');
 console.log('🌱 Seed: Zebra Box...');
 
 const run = db.transaction(() => {
-    // Insere tenant (ignora se já existir)
-    const tenantId = db.prepare(`
-        INSERT OR IGNORE INTO tenants (slug, name, whatsapp, plan)
+    // Insere parceiro (ignora se já existir)
+    const parceiroId = db.prepare(`
+        INSERT OR IGNORE INTO parceiros (slug, name, whatsapp, plan)
         VALUES (?, ?, ?, ?)
     `).run('zebra-box', 'Zebra Box', '5551993668728', 'free').lastInsertRowid;
 
     // Se já existia, busca o id
-    const tenant = db.prepare(`SELECT id FROM tenants WHERE slug = ?`).get('zebra-box');
+    const parceiro = db.prepare(`SELECT id FROM parceiros WHERE slug = ?`).get('zebra-box');
 
     // Insere formulário form01 → slug "container"
     db.prepare(`
         INSERT OR IGNORE INTO forms
-            (tenant_id, slug, title, description, fields_json, message_template)
+            (parceiro_id, slug, title, description, fields_json, message_template)
         VALUES (?, ?, ?, ?, ?, ?)
     `).run(
-        tenant.id,
+        parceiro.id,
         'container',  // slug semântico (URL: /zebra-box/container)
         'Solicite aluguel de um Container',
         'Responda 3 perguntas rápidas e fale com o especialista.',
@@ -52,12 +52,12 @@ const run = db.transaction(() => {
         'Olá! Vim pelo 2chat. Tenho interesse em container para {{purpose}} em {{location}} por {{period}}.',
     );
 
-    return db.prepare(`SELECT id FROM tenants WHERE slug = ?`).get('zebra-box');
+    return db.prepare(`SELECT id FROM parceiros WHERE slug = ?`).get('zebra-box');
 });
 
 try {
     const result = run();
-    console.log(`✅ Zebra Box seed OK — tenant_id: ${result.id}`);
+    console.log(`✅ Zebra Box seed OK — parceiro_id: ${result.id}`);
     console.log('   └─ Formulário slug: "container" (rota: /zebra-box/container)');
 } catch (err) {
     console.error('❌ Seed falhou:', err.message);

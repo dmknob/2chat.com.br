@@ -67,7 +67,7 @@ exports.postWaitlist = (req, res) => {
 // =============================================================================
 // POST /api/leads
 // Receptor do Cloudflare Worker — armazena lead qualificado no SQLite
-// Payload: { tenant, form_id, payload_json, ip_hash, city, region, country, created_at }
+// Payload: { parceiro, form_id, payload_json, ip_hash, city, region, country, created_at }
 // =============================================================================
 exports.postLead = (req, res) => {
     // Validação mínima de origem: header enviado pelo Worker
@@ -77,7 +77,7 @@ exports.postLead = (req, res) => {
     }
 
     const {
-        tenant,
+        parceiro,
         form_id,
         payload_json,
         ip_hash,
@@ -88,24 +88,24 @@ exports.postLead = (req, res) => {
     } = req.body || {};
 
     // Valida campos obrigatórios
-    if (!tenant || !form_id || !payload_json) {
-        return res.status(400).json({ error: 'Campos obrigatórios ausentes: tenant, form_id, payload_json' });
+    if (!parceiro || !form_id || !payload_json) {
+        return res.status(400).json({ error: 'Campos obrigatórios ausentes: parceiro, form_id, payload_json' });
     }
 
     try {
-        // Resolve IDs relacionais (tenant_id e form_id numérico)
-        const tenantRow = db.prepare(`
-            SELECT id FROM tenants WHERE slug = ? AND is_active = 1
-        `).get(tenant);
+        // Resolve IDs relacionais (parceiro_id e form_id numérico)
+        const parceiroRow = db.prepare(`
+            SELECT id FROM parceiros WHERE slug = ? AND is_active = 1
+        `).get(parceiro);
 
-        let dbTenantId = tenantRow?.id ?? null;
+        let dbParceiroId = parceiroRow?.id ?? null;
         let dbFormId   = null;
 
-        if (dbTenantId) {
+        if (dbParceiroId) {
             const formRow = db.prepare(`
                 SELECT id, slug_locked FROM forms
-                WHERE tenant_id = ? AND slug = ? AND is_active = 1
-            `).get(dbTenantId, form_id);
+                WHERE parceiro_id = ? AND slug = ? AND is_active = 1
+            `).get(dbParceiroId, form_id);
 
             if (formRow) {
                 dbFormId = formRow.id;
@@ -120,13 +120,13 @@ exports.postLead = (req, res) => {
             }
         }
 
-        // Insere o lead (mesmo sem tenant/form resolvidos — graceful degradation)
+        // Insere o lead (mesmo sem parceiro/form resolvidos — graceful degradation)
         db.prepare(`
             INSERT INTO leads
-                (tenant_id, form_id, payload_json, ip_hash, city, region, country, source, created_at)
+                (parceiro_id, form_id, payload_json, ip_hash, city, region, country, source, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `).run(
-            dbTenantId,
+            dbParceiroId,
             dbFormId,
             typeof payload_json === 'string' ? payload_json : JSON.stringify(payload_json),
             ip_hash   || null,
@@ -138,7 +138,7 @@ exports.postLead = (req, res) => {
         );
 
         logger.info('Lead capturado', {
-            tenant,
+            parceiro,
             form_id,
             city:    city    || 'n/a',
             country: country || 'n/a',
@@ -147,7 +147,7 @@ exports.postLead = (req, res) => {
         return res.status(201).json({ success: true });
 
     } catch (err) {
-        logger.error('Leads API: erro ao inserir', { message: err.message, tenant, form_id });
+        logger.error('Leads API: erro ao inserir', { message: err.message, parceiro, form_id });
         return res.status(500).json({ error: 'Erro interno.' });
     }
 };

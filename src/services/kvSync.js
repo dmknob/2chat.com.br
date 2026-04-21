@@ -1,17 +1,17 @@
 // src/services/kvSync.js
-// Publica configuração de tenant do SQLite → Cloudflare KV (TENANTS_KV)
+// Publica configuração de parceiro do SQLite → Cloudflare KV (TENANTS_KV)
 // Chamado manualmente (CLI) ou pelo painel admin (v1)
 const db     = require('../../database/db');
 const logger = require('../logger');
 
 /**
- * Lê tenant + forms do SQLite e publica no Cloudflare KV.
+ * Lê parceiro + forms do SQLite e publica no Cloudflare KV.
  * O Worker passa a responder /{slug}/* imediatamente após o publish.
  *
- * @param {string} slug - Slug do tenant ex: "zebra-box"
+ * @param {string} slug - Slug do parceiro ex: "zebra-box"
  * @returns {Object} - Config JSON publicada no KV
  */
-async function publishTenantToKV(slug) {
+async function publishParceiroToKV(slug) {
     const CF_ACCOUNT_ID      = process.env.CF_ACCOUNT_ID;
     const CF_API_TOKEN       = process.env.CF_API_TOKEN;
     const KV_TENANTS_NS_ID   = process.env.KV_TENANTS_NAMESPACE_ID;
@@ -22,24 +22,24 @@ async function publishTenantToKV(slug) {
         );
     }
 
-    // Busca tenant ativo no banco
-    const tenant = db.prepare(`
-        SELECT * FROM tenants WHERE slug = ? AND is_active = 1
+    // Busca parceiro ativo no banco
+    const parceiro = db.prepare(`
+        SELECT * FROM parceiros WHERE slug = ? AND is_active = 1
     `).get(slug);
 
-    if (!tenant) throw new Error(`Tenant '${slug}' não encontrado ou inativo`);
+    if (!parceiro) throw new Error(`Parceiro '${slug}' não encontrado ou inativo`);
 
-    // Busca formulários ativos do tenant
+    // Busca formulários ativos do parceiro
     const forms = db.prepare(`
-        SELECT * FROM forms WHERE tenant_id = ? AND is_active = 1
+        SELECT * FROM forms WHERE parceiro_id = ? AND is_active = 1
         ORDER BY id ASC
-    `).all(tenant.id);
+    `).all(parceiro.id);
 
     // Monta o JSON de configuração que o Worker vai ler do KV
     const kvConfig = {
-        slug:     tenant.slug,
-        name:     tenant.name,
-        whatsapp: tenant.whatsapp,          // sempre string (corpo-digital §1.4)
+        slug:     parceiro.slug,
+        name:     parceiro.name,
+        whatsapp: parceiro.whatsapp,          // sempre string (corpo-digital §1.4)
         forms:    Object.fromEntries(forms.map(f => [
             f.slug,
             {
@@ -53,11 +53,11 @@ async function publishTenantToKV(slug) {
     };
 
     // Publica no KV via API REST da Cloudflare
-    // Chave: "tenant:{slug}" — prefixo evita colisão com outras chaves futuras
+    // Chave: "parceiro:{slug}" — prefixo evita colisão com outras chaves futuras
     const kvUrl = [
         `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}`,
         `/storage/kv/namespaces/${KV_TENANTS_NS_ID}`,
-        `/values/tenant:${slug}`,
+        `/values/parceiro:${slug}`,
     ].join('');
 
     const res = await fetch(kvUrl, {
@@ -74,15 +74,15 @@ async function publishTenantToKV(slug) {
         throw new Error(`Cloudflare KV API respondeu ${res.status}: ${body}`);
     }
 
-    logger.info(`☁️  Tenant '${slug}' publicado no KV (${forms.length} form(s))`);
+    logger.info(`☁️  Parceiro '${slug}' publicado no KV (${forms.length} form(s))`);
     return kvConfig;
 }
 
 /**
- * Remove tenant do KV (quando desativado ou deletado)
+ * Remove parceiro do KV (quando desativado ou deletado)
  * @param {string} slug
  */
-async function removeTenantFromKV(slug) {
+async function removeParceiroFromKV(slug) {
     const CF_ACCOUNT_ID    = process.env.CF_ACCOUNT_ID;
     const CF_API_TOKEN     = process.env.CF_API_TOKEN;
     const KV_TENANTS_NS_ID = process.env.KV_TENANTS_NAMESPACE_ID;
@@ -90,7 +90,7 @@ async function removeTenantFromKV(slug) {
     const kvUrl = [
         `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}`,
         `/storage/kv/namespaces/${KV_TENANTS_NS_ID}`,
-        `/values/tenant:${slug}`,
+        `/values/parceiro:${slug}`,
     ].join('');
 
     await fetch(kvUrl, {
@@ -98,7 +98,7 @@ async function removeTenantFromKV(slug) {
         headers: { 'Authorization': `Bearer ${CF_API_TOKEN}` },
     });
 
-    logger.info(`🗑️  Tenant '${slug}' removido do KV`);
+    logger.info(`🗑️  Parceiro '${slug}' removido do KV`);
 }
 
-module.exports = { publishTenantToKV, removeTenantFromKV };
+module.exports = { publishParceiroToKV, removeParceiroFromKV };

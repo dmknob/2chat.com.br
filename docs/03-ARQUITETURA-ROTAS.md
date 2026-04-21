@@ -22,7 +22,7 @@ Cloudflare DNS
 │   └─ GET  /api/health         → Node.js health check
 │
 └─ Rota começa com /{slug} → Cloudflare Worker
-    ├─ GET  /{slug}             → Hub do tenant (lista de forms)
+    ├─ GET  /{slug}             → Hub do parceiro (lista de forms)
     └─ GET  /{slug}/{form-id}   → Formulário de qualificação
 ```
 
@@ -31,7 +31,7 @@ Cloudflare DNS
 ## 🟠 Cloudflare Worker
 
 ### Responsabilidades
-1. Identificar tenant e formulário pela URL
+1. Identificar parceiro e formulário pela URL
 2. Carregar configuração (v0: hardcoded | v1: KV)
 3. Renderizar HTML do formulário diretamente na resposta
 4. Processar submit do formulário
@@ -49,7 +49,7 @@ addEventListener('fetch', event => {
 async function handleRequest(request) {
   const url = new URL(request.url);
   const parts = url.pathname.split('/').filter(Boolean);
-  // parts[0] = slug do tenant (ex: "zebra-box")
+  // parts[0] = slug do parceiro (ex: "zebra-box")
   // parts[1] = form-id (ex: "form01") — opcional
 
   // Rotas que passam para o VPS são tratadas antes:
@@ -59,23 +59,23 @@ async function handleRequest(request) {
   const slug   = parts[0]; // "zebra-box"
   const formId = parts[1]; // "form01" ou undefined
 
-  const tenant = await getTenantConfig(slug); // KV ou hardcoded
-  if (!tenant) return new Response('Not Found', { status: 404 });
+  const parceiro = await getParceiroConfig(slug); // KV ou hardcoded
+  if (!parceiro) return new Response('Not Found', { status: 404 });
 
   if (!formId) {
     // Hub: lista de formulários disponíveis
-    return renderHub(tenant);
+    return renderHub(parceiro);
   }
 
-  const form = tenant.forms[formId];
+  const form = parceiro.forms[formId];
   if (!form) return new Response('Not Found', { status: 404 });
 
   if (request.method === 'GET') {
-    return renderForm(tenant, form);
+    return renderForm(parceiro, form);
   }
 
   if (request.method === 'POST') {
-    return handleSubmit(request, tenant, form);
+    return handleSubmit(request, parceiro, form);
   }
 }
 ```
@@ -83,13 +83,13 @@ async function handleRequest(request) {
 ### Fluxo de Submit do Formulário
 
 ```javascript
-async function handleSubmit(request, tenant, form) {
+async function handleSubmit(request, parceiro, form) {
   const formData = await request.formData();
 
   // 1. Validação mínima (campos required)
   for (const field of form.fields) {
     if (field.required && !formData.get(field.id)) {
-      return renderForm(tenant, form, { error: `Campo "${field.label}" é obrigatório.` });
+      return renderForm(parceiro, form, { error: `Campo "${field.label}" é obrigatório.` });
     }
   }
 
@@ -101,19 +101,19 @@ async function handleSubmit(request, tenant, form) {
 
   // 3. Montar mensagem WhatsApp
   const message = renderTemplate(form.message_template, payload);
-  const waUrl   = `https://wa.me/${tenant.whatsapp}?text=${encodeURIComponent(message)}`;
+  const waUrl   = `https://wa.me/${parceiro.whatsapp}?text=${encodeURIComponent(message)}`;
 
   // 4. Logging assíncrono com fallback KV (NÃO bloqueia o redirect)
-  event.waitUntil(logLead(tenant, form, payload, request));
+  event.waitUntil(logLead(parceiro, form, payload, request));
   // (event.waitUntil garante que o fetch roda mesmo após a resposta ser enviada)
 
   // 5. Redirecionar imediatamente para WhatsApp
   return Response.redirect(waUrl, 302);
 }
 
-async function logLead(tenant, form, payload, request) {
+async function logLead(parceiro, form, payload, request) {
   const leadData = {
-    tenant:      tenant.slug,
+    parceiro:      parceiro.slug,
     form_id:     form.id,
     payload_json: JSON.stringify(payload),
     ip_hash:     await hashIP(request.headers.get('CF-Connecting-IP')),
@@ -201,7 +201,7 @@ const TENANTS_V0 = {
 ### Configuração do Worker — v1 via KV
 
 ```javascript
-async function getTenantConfig(slug) {
+async function getParceiroConfig(slug) {
   // v0: return TENANTS_V0[slug] || null;
 
   // v1:
@@ -228,7 +228,7 @@ Headers:
 
 Body:
   {
-    "tenant":      "zebra-box",
+    "parceiro":      "zebra-box",
     "form_id":     "form01",
     "payload_json": "{\"location\":\"Porto Alegre\",\"period\":\"3 meses\",\"purpose\":\"Obra\"}",
     "ip_hash":     "sha256_do_ip",
@@ -274,8 +274,8 @@ async function drainKV() {
     try {
       // Insere no SQLite
       await db.run(
-        'INSERT INTO leads (tenant_slug, form_id, payload_json, ip_hash, created_at, source) VALUES (?,?,?,?,?,?)',
-        [lead.tenant, lead.form_id, lead.payload_json, lead.ip_hash, lead.created_at, 'kv_buffer']
+        'INSERT INTO leads (parceiro_slug, form_id, payload_json, ip_hash, created_at, source) VALUES (?,?,?,?,?,?)',
+        [lead.parceiro, lead.form_id, lead.payload_json, lead.ip_hash, lead.created_at, 'kv_buffer']
       );
       // Remove do KV
       await cfApi.deleteKey(key.name);
@@ -302,7 +302,7 @@ async function drainKV() {
 | `/api/waitlist` | POST | VPS (Node.js) | Captura email de waitlist |
 | `/api/leads` | POST | VPS (Node.js) | Persistência de lead |
 | `/api/health` | GET | VPS (Node.js) | Health check |
-| `/{slug}` | GET | Worker | Hub do tenant (lista de formulários) |
+| `/{slug}` | GET | Worker | Hub do parceiro (lista de formulários) |
 | `/{slug}/{form-id}` | GET | Worker | Formulário de qualificação |
 | `/{slug}/{form-id}` | POST | Worker | Submit → log + redirect WhatsApp |
 
@@ -338,12 +338,12 @@ Leandro (Zebra Box) recebe no WhatsApp:
   → Lead quente, contextualizado ✅
 ```
 
-### Fluxo 2 — Acesso via link genérico do tenant
+### Fluxo 2 — Acesso via link genérico do parceiro
 
 ```
 URL: 2chat.com.br/zebra-box
 │
-GET /zebra-box → Worker verifica tenant
+GET /zebra-box → Worker verifica parceiro
 │
 Renderiza Hub (mínimo):
   ─────────────────────

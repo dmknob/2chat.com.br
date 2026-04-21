@@ -11,6 +11,7 @@
     "watch:css": "tailwindcss -i ./src/input.css -o ./public/css/style.css --watch",
     "db:setup": "node database/setup-db.js",
     "db:seed": "node scripts/seed-zebra-box.js",
+    "db:reset": "rm -f 2chat_dev.db 2chat_dev.db-wal 2chat_dev.db-shm && npm run db:setup && npm run db:seed",
     "db:dump": "node scripts/dump-db.js",
     "db:restore": "node scripts/restore-db.js",
     "kv:sync": "node scripts/sync-kv.js",

@@ -38,20 +38,20 @@ O fluxo é simples e direto:
 
 ### v0 — Zebra Box (Interno, Hardcoded)
 - Cloudflare Worker com configuração embutida
-- Apenas Zebra Box como tenant
+- Apenas Zebra Box como parceiro
 - Sem área de admin, sem login
 - **Objetivo:** Validar o fluxo completo em produção
 
-### v1 — Multi-tenant Parametrizado (Interno)
+### v1 — Multi-parceiro Parametrizado (Interno)
 - Configuração lida do Cloudflare KV
 - Onboarding manual via admin (CLI ou painel simples)
-- Múltiplos projetos internos como tenants de teste
+- Múltiplos projetos internos como parceiros de teste
 - **Objetivo:** Validar escalabilidade e operação do KV
 
 ### v2 — Beta Fechado (Externo)
 - Primeiro clientes externos (beta fechado, lista de espera)
 - Modelo freemium começa a ser desenhado
-- Dashboard básico para o tenant ver leads
+- Dashboard básico para o parceiro ver leads
 
 ---
 
@@ -92,7 +92,7 @@ Rota especial:
 
 ### 3.2 Cloudflare Workers (Camada de Borda)
 
-**Responsabilidade:** Interceptar requisições de tenant, renderizar formulários, processar submits, garantir resiliência.
+**Responsabilidade:** Interceptar requisições de parceiro, renderizar formulários, processar submits, garantir resiliência.
 
 **Por que Workers:**
 - Mesmo que o VPS fique offline, o formulário é exibido e o redirect para WhatsApp acontece
@@ -101,7 +101,7 @@ Rota especial:
 
 **Rotas gerenciadas pelo Worker:**
 ```
-GET  /{slug}           → Hub do tenant (lista de formulários)
+GET  /{slug}           → Hub do parceiro (lista de formulários)
 GET  /{slug}/{form-id} → Formulário de qualificação
 POST /{slug}/{form-id} → Submit do formulário (Worker processa)
 ```
@@ -147,7 +147,7 @@ VPS (quando online):
 
 > ⚠️ **Nota v0:** O drain do KV no VPS é implementação crítica da v1. No v0, o KV pode ser drenado manualmente via Wrangler CLI. Aceite de risco controlado para cliente interno.
 
-### 3.4 Configuração de Tenant
+### 3.4 Configuração de Parceiro
 
 **v0 — Hardcoded no Worker:**
 ```javascript
@@ -192,7 +192,7 @@ Estrutura do KV: chave = `{slug}`, valor = JSON com mesmo schema acima.
 
 ```
 POST /api/leads
-  Body: { tenant, form_id, payload_json, ip_hash, created_at }
+  Body: { parceiro, form_id, payload_json, ip_hash, created_at }
   Response: 201 Created | 400 Bad Request
   Timeout esperado pelo Worker: 400ms
 
@@ -212,7 +212,7 @@ GET /api/health
 
 ## 4. Especificações — MVP v0 Zebra Box
 
-### 4.1 Tenant Zebra Box
+### 4.1 Parceiro Zebra Box
 
 ```
 Slug:      zebra-box
@@ -246,7 +246,7 @@ const waUrl = `https://wa.me/5551993668728?text=${encodeURIComponent(template)}`
 -- Leads dos formulários
 CREATE TABLE leads (
     id           INTEGER  PRIMARY KEY AUTOINCREMENT,
-    tenant_slug  TEXT     NOT NULL,
+    parceiro_slug  TEXT     NOT NULL,
     form_id      TEXT     NOT NULL,
     payload_json TEXT     NOT NULL,  -- campos do formulário em JSON
     ip_hash      TEXT,               -- SHA256 do IP (LGPD-safe)
@@ -254,7 +254,7 @@ CREATE TABLE leads (
     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX idx_tenant_form  ON leads(tenant_slug, form_id);
+CREATE INDEX idx_parceiro_form  ON leads(parceiro_slug, form_id);
 CREATE INDEX idx_created_at   ON leads(created_at);
 
 -- Waitlist da landing page (separada dos leads operacionais)
@@ -287,14 +287,14 @@ CREATE TABLE kv_buffer (
 | `GET /termos-de-uso` | VPS/CDN (estático) | Página legal | Termos de uso |
 | `GET /politica-de-privacidade` | VPS/CDN (estático) | Página legal | Política de privacidade LGPD |
 | `POST /api/waitlist` | VPS | API | Captura email waitlist |
-| `GET /{slug}` | Worker | Hub tenant | Lista de formulários do cliente |
+| `GET /{slug}` | Worker | Hub parceiro | Lista de formulários do cliente |
 | `GET /{slug}/{form-id}` | Worker | Formulário | Qualificação do lead |
 | `POST /api/leads` | VPS | API | Persistência do lead |
 | `GET /api/health` | VPS | Status | Health check |
 
 ---
 
-## 6. Hub do Tenant (`/{slug}`)
+## 6. Hub do Parceiro (`/{slug}`)
 
 ### Propósito
 Fallback para links genéricos (`2chat.com.br/zebra-box`). Não é a URL principal que o cliente divulga — essa é sempre a URL do formulário específico (`2chat.com.br/zebra-box/form01`).
@@ -352,11 +352,11 @@ Honeypot anti-bot: campo hidden `name="website"`.
 - [x] Log assíncrono no VPS com fallback KV
 - [x] Landing page com waitlist
 
-### v1 (Multi-tenant parametrizado)
+### v1 (Multi-parceiro parametrizado)
 - [ ] Config no Cloudflare KV
-- [ ] Lifecycle de admin (criar/editar tenant via CLI ou painel mínimo)
+- [ ] Lifecycle de admin (criar/editar parceiro via CLI ou painel mínimo)
 - [ ] Drain automático KV → SQLite (cron no VPS)
-- [ ] Múltiplos formulários por tenant
+- [ ] Múltiplos formulários por parceiro
 - [ ] Dashboard simples de leads (autenticado por magic link)
 
 ### v2 (Beta Externo)

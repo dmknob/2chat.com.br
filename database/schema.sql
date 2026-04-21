@@ -7,9 +7,9 @@ PRAGMA journal_mode = WAL;
 PRAGMA foreign_keys = ON;
 
 -- -----------------------------------------------------------------------------
--- Tenants: clientes do 2chat
+-- Parceiros: clientes do 2chat
 -- -----------------------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS tenants (
+CREATE TABLE IF NOT EXISTS parceiros (
     id          INTEGER  PRIMARY KEY AUTOINCREMENT,
     slug        TEXT     UNIQUE NOT NULL,   -- "zebra-box" (kebab-case, URL-safe)
     name        TEXT     NOT NULL,          -- "Zebra Box"
@@ -21,12 +21,12 @@ CREATE TABLE IF NOT EXISTS tenants (
 );
 
 -- -----------------------------------------------------------------------------
--- Forms: formulários de qualificação por tenant
+-- Forms: formulários de qualificação por parceiro
 -- slug é gerado via slugify(title) e bloqueado após o 1° lead
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS forms (
     id               INTEGER  PRIMARY KEY AUTOINCREMENT,
-    tenant_id        INTEGER  NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+    parceiro_id      INTEGER  NOT NULL REFERENCES parceiros(id) ON DELETE CASCADE,
     slug             TEXT     NOT NULL,        -- "container" (kebab-case, URL-safe)
     slug_locked      BOOLEAN  DEFAULT 0,       -- 1 após o 1° lead → imutável
     title            TEXT     NOT NULL,        -- "Solicite aluguel de um Container"
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS forms (
     is_active        BOOLEAN  DEFAULT 1,
     created_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(tenant_id, slug)                    -- slug único por tenant
+    UNIQUE(parceiro_id, slug)                    -- slug único por parceiro
 );
 
 -- -----------------------------------------------------------------------------
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS forms (
 -- -----------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS leads (
     id           INTEGER  PRIMARY KEY AUTOINCREMENT,
-    tenant_id    INTEGER  REFERENCES tenants(id),
+    parceiro_id  INTEGER  REFERENCES parceiros(id),
     form_id      INTEGER  REFERENCES forms(id),
     payload_json TEXT     NOT NULL,    -- {"location":"POA","period":"3 meses","purpose":"Obra"}
     ip_hash      TEXT,                 -- pseudonimizado (LGPD)
@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS kv_buffer (
 -- -----------------------------------------------------------------------------
 -- Índices de performance
 -- -----------------------------------------------------------------------------
-CREATE INDEX IF NOT EXISTS idx_leads_tenant_form  ON leads(tenant_id, form_id);
-CREATE INDEX IF NOT EXISTS idx_leads_created_at   ON leads(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_leads_country       ON leads(country);
-CREATE INDEX IF NOT EXISTS idx_forms_tenant_active ON forms(tenant_id, is_active);
-CREATE INDEX IF NOT EXISTS idx_kv_buffer_pending   ON kv_buffer(processed) WHERE processed = 0;
+CREATE INDEX IF NOT EXISTS idx_leads_parceiro_form  ON leads(parceiro_id, form_id);
+CREATE INDEX IF NOT EXISTS idx_leads_created_at      ON leads(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_leads_country          ON leads(country);
+CREATE INDEX IF NOT EXISTS idx_forms_parceiro_active  ON forms(parceiro_id, is_active);
+CREATE INDEX IF NOT EXISTS idx_kv_buffer_pending      ON kv_buffer(processed) WHERE processed = 0;

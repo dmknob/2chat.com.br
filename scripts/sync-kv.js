@@ -1,13 +1,13 @@
 #!/usr/bin/env node
 require('dotenv').config();
-const { publishTenantToKV } = require('../src/services/kvSync');
+const { publishParceiroToKV } = require('../src/services/kvSync');
 const logger = require('../src/logger');
 
 const slug = process.argv[2] || 'zebra-box';
 
-console.log(`🚀 Iniciando sincronização KV para: ${slug}...`);
+console.log(`🚀 Iniciando sincronização KV para o parceiro: ${slug}...`);
 
-publishTenantToKV(slug)
+publishParceiroToKV(slug)
     .then((config) => {
         console.log('✅ Sincronização concluída com sucesso!');
         console.log('JSON publicado:', JSON.stringify(config, null, 2));

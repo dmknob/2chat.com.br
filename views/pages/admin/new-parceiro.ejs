@@ -7,7 +7,7 @@
   
   <header class="border-b border-gray-800 bg-black sticky top-0 z-10 w-full px-6 py-4 flex justify-between items-center">
     <div class="text-xl font-extrabold text-white">
-      2chat<span class="text-blue-500">.</span> <span class="text-gray-500 text-sm ml-2 font-medium">Novo Tenant</span>
+      2chat<span class="text-blue-500">.</span> <span class="text-gray-500 text-sm ml-2 font-medium">Novo Parceiro</span>
     </div>
     <div>
         <a href="/admin/hub" class="text-sm text-gray-400 hover:text-white transition-colors mr-4">← Voltar</a>
@@ -18,7 +18,7 @@
   <main class="flex-1 w-full max-w-4xl mx-auto p-6 space-y-8">
     
     <div class="mb-4">
-      <h1 class="text-2xl font-bold text-white">Criar Novo Parceiro (Tenant)</h1>
+      <h1 class="text-2xl font-bold text-white">Criar Novo Parceiro</h1>
       <p class="text-gray-400 text-sm mt-1">Isso registrará a empresa no banco de dados e publicará o funil na Cloudflare (Worker) imediatamente.</p>
     </div>
 
@@ -28,20 +28,20 @@
       </div>
     <% } %>
 
-    <form action="/admin/tenants/new" method="POST" class="space-y-6 bg-gray-900 border border-gray-800 p-6 sm:p-8 rounded-3xl shadow-xl">
+    <form action="/admin/parceiros/new" method="POST" class="space-y-6 bg-gray-900 border border-gray-800 p-6 sm:p-8 rounded-3xl shadow-xl">
       
       <!-- Dados da Empresa -->
       <section>
-        <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white">1. Empresa</h2>
+        <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white">1. Parceiro</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-1">Nome da Empresa</label>
-            <input type="text" name="tenant_name" required placeholder="Ex: Zebra Box"
+            <label class="block text-sm font-medium text-gray-300 mb-1">Nome do Parceiro</label>
+            <input type="text" name="parceiro_name" required placeholder="Ex: Zebra Box"
                    class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-1">Slug (URL)</label>
-            <input type="text" name="tenant_slug" required placeholder="Ex: zebra-box"
+            <input type="text" name="parceiro_slug" required placeholder="Ex: zebra-box"
                    class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
             <p class="text-xs text-gray-500 mt-1">Somente letras minúsculas e traços.</p>
           </div>

@@ -79,14 +79,14 @@ router.get('/logout', (req, res) => {
 // =============================================================================
 router.get('/hub', requireAuth, (req, res) => {
     // Busca dados analíticos rápidos
-    const tenantsCount = db.prepare('SELECT count(*) as total FROM tenants WHERE is_active = 1').get().total;
+    const parceirosCount = db.prepare('SELECT count(*) as total FROM parceiros WHERE is_active = 1').get().total;
     const leadsCount   = db.prepare('SELECT count(*) as total FROM leads').get().total;
     
     // Busca últimos 50 leads
     const recentLeads = db.prepare(`
-        SELECT l.*, t.name as tenant_name, f.title as form_title 
+        SELECT l.*, p.name as parceiro_name, f.title as form_title 
         FROM leads l
-        LEFT JOIN tenants t ON l.tenant_id = t.id
+        LEFT JOIN parceiros p ON l.parceiro_id = p.id
         LEFT JOIN forms f ON l.form_id = f.id
         ORDER BY l.created_at DESC LIMIT 50
     `).all();
@@ -95,30 +95,30 @@ router.get('/hub', requireAuth, (req, res) => {
         title: 'Admin Hub',
         description: 'Gerenciamento estrutural do 2chat',
         canonical: '/admin/hub',
-        tenantsCount,
+        parceirosCount,
         leadsCount,
         recentLeads
     });
 });
 
 // =============================================================================
-// GET /admin/tenants/new (Formulário Visual de Criação)
+// GET /admin/parceiros/new (Formulário Visual de Criação)
 // =============================================================================
-router.get('/tenants/new', requireAuth, (req, res) => {
-    res.render('pages/admin/new-tenant', {
-        title: 'Criar Tenant',
+router.get('/parceiros/new', requireAuth, (req, res) => {
+    res.render('pages/admin/new-parceiro', {
+        title: 'Criar Parceiro',
         description: 'Adicionar nova empresa ao 2chat',
-        canonical: '/admin/tenants/new',
+        canonical: '/admin/parceiros/new',
         errorMessage: req.session.error || null
     });
     if (req.session) req.session.error = null;
 });
 
 // =============================================================================
-// POST /admin/tenants/new (Processamento e Sync CF)
+// POST /admin/parceiros/new (Processamento e Sync CF)
 // =============================================================================
-router.post('/tenants/new', requireAuth, async (req, res) => {
-    const { tenant_name, tenant_slug, whatsapp, form_title, form_slug, form_description, message_template, fields_json } = req.body;
+router.post('/parceiros/new', requireAuth, async (req, res) => {
+    const { parceiro_name, parceiro_slug, whatsapp, form_title, form_slug, form_description, message_template, fields_json } = req.body;
 
     try {
         // Valida JSON
@@ -128,28 +128,28 @@ router.post('/tenants/new', requireAuth, async (req, res) => {
             if (!Array.isArray(parsedFields)) throw new Error('Schema de campos precisa ser um Array [ ]');
         } catch (jErr) {
             req.session.error = 'Erro no Schema JSON dos Campos: ' + jErr.message;
-            return res.redirect('/admin/tenants/new');
+            return res.redirect('/admin/parceiros/new');
         }
 
         // Transação no SQLite
         db.transaction(() => {
-            // Insere Tenant
-            const tenantStmt = db.prepare(`
-                INSERT OR IGNORE INTO tenants (slug, name, whatsapp, plan)
+            // Insere Parceiro
+            const parceiroStmt = db.prepare(`
+                INSERT OR IGNORE INTO parceiros (slug, name, whatsapp, plan)
                 VALUES (?, ?, ?, 'free')
             `);
-            tenantStmt.run(tenant_slug, tenant_name, whatsapp);
+            parceiroStmt.run(parceiro_slug, parceiro_name, whatsapp);
 
-            const tenant = db.prepare('SELECT id FROM tenants WHERE slug = ?').get(tenant_slug);
+            const parceiro = db.prepare('SELECT id FROM parceiros WHERE slug = ?').get(parceiro_slug);
 
             // Insere Form
             const formStmt = db.prepare(`
                 INSERT OR IGNORE INTO forms
-                (tenant_id, slug, title, description, fields_json, message_template)
+                (parceiro_id, slug, title, description, fields_json, message_template)
                 VALUES (?, ?, ?, ?, ?, ?)
             `);
             formStmt.run(
-                tenant.id,
+                parceiro.id,
                 form_slug,
                 form_title,
                 form_description || '',
@@ -159,15 +159,15 @@ router.post('/tenants/new', requireAuth, async (req, res) => {
         })();
 
         // Sincroniza com a Cloudflare (Worker)
-        await kvSync.publishTenantToKV(tenant_slug);
+        await kvSync.publishParceiroToKV(parceiro_slug);
 
-        logger.info(`Novo Tenant Criado & Sincronizado: ${tenant_slug}`);
+        logger.info(`Novo Parceiro Criado & Sincronizado: ${parceiro_slug}`);
         res.redirect('/admin/hub');
 
     } catch (err) {
-        logger.error('Erro ao salvar UI Tenant', { error: err.message });
+        logger.error('Erro ao salvar UI Parceiro', { error: err.message });
         req.session.error = 'Falha ao salvar. Verifique se o slug já existe. Erro: ' + err.message;
-        res.redirect('/admin/tenants/new');
+        res.redirect('/admin/parceiros/new');
     }
 });
 
