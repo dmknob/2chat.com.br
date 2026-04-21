@@ -54,8 +54,8 @@
               <th class="p-4 font-medium">Data</th>
               <th class="p-4 font-medium">Parceiro</th>
               <th class="p-4 font-medium">Origem</th>
-              <th class="p-4 font-medium">Payload (Raw)</th>
-              <th class="p-4 font-medium text-right">Origem Sys</th>
+              <th class="p-4 font-medium">Payload (Resumo)</th>
+              <th class="p-4 font-medium text-right">Ações</th>
             </tr>
           </thead>
           <tbody class="text-sm divide-y divide-gray-800">
@@ -65,7 +65,7 @@
               </tr>
             <% } else { %>
               <% recentLeads.forEach(lead => { %>
-                <tr class="hover:bg-gray-800/50 transition-colors group">
+                <tr class="hover:bg-gray-800/50 transition-colors group cursor-pointer" onclick="window.location='/admin/leads/<%= lead.id %>'">
                   <td class="p-4 text-gray-300 whitespace-nowrap">
                     <%= new Date(lead.created_at).toLocaleString('pt-BR') %>
                   </td>
@@ -82,8 +82,12 @@
                   <td class="p-4 text-gray-400 font-mono text-xs truncate max-w-xs" title="<%= lead.payload_json %>">
                     <%= lead.payload_json %>
                   </td>
-                  <td class="p-4 text-right text-xs text-gray-500">
-                    <span class="bg-gray-800 px-2 py-1 rounded inline-block"><%= lead.source || 'api' %></span>
+                  <td class="p-4 text-right">
+                    <a href="/admin/leads/<%= lead.id %>" 
+                       class="inline-flex items-center gap-1 text-xs font-bold text-blue-500 hover:text-blue-400 transition-colors">
+                       Ver Detalhes
+                       <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </a>
                   </td>
                 </tr>
               <% }) %>

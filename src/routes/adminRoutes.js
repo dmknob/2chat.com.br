@@ -118,6 +118,39 @@ router.get('/waitlist', requireAuth, (req, res) => {
 });
 
 // =============================================================================
+// GET /admin/leads/:id (Detalhes do Lead)
+// =============================================================================
+router.get('/leads/:id', requireAuth, (req, res) => {
+    const { id } = req.params;
+
+    const lead = db.prepare(`
+        SELECT l.*, p.name as parceiro_name, p.slug as parceiro_slug, 
+               f.title as form_title, f.slug as form_slug, f.fields_json
+        FROM leads l
+        LEFT JOIN parceiros p ON l.parceiro_id = p.id
+        LEFT JOIN forms f ON l.form_id = f.id
+        WHERE l.id = ?
+    `).get(id);
+
+    if (!lead) {
+        return res.status(404).send('Lead não encontrado.');
+    }
+
+    // Parse do JSON para exibição limpa
+    const payload = JSON.parse(lead.payload_json);
+    const formFields = lead.fields_json ? JSON.parse(lead.fields_json) : [];
+
+    res.render('pages/admin/lead-detail', {
+        title: `Detalhes do Lead #${id}`,
+        description: `Visualização completa dos dados capturados no lead #${id}`,
+        canonical: `/admin/leads/${id}`,
+        lead,
+        payload,
+        formFields
+    });
+});
+
+// =============================================================================
 // GET /admin/parceiros/new (Formulário Visual de Criação)
 // =============================================================================
 router.get('/parceiros/new', requireAuth, (req, res) => {
