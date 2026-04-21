@@ -16,7 +16,7 @@ server {
     proxy_buffer_size 32k;
 
     location / {
-        proxy_pass http://127.0.0.1:3000;
+        proxy_pass http://127.0.0.1:3010;
         proxy_http_version 1.1;
         
         # Headers necessários para o Express trust proxy e websockets

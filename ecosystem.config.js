@@ -4,6 +4,7 @@ module.exports = {
       name: '2chat',
       script: 'server.js',
       instances: 1, // Em SQLite, manter 1 instância para evitar locks concorrentes pesados
+      exec_mode: 'fork',
       autorestart: true,
       watch: false,
       max_memory_restart: '120M',
