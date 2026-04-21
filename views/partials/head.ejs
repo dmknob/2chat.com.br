@@ -33,10 +33,14 @@
 <script type="application/ld+json"><%- schemaJson %></script>
 <% } %>
 
-<%# === FONTES: Inter (Google Fonts) — preconnect para reduzir latência === %>
+<%# === FONTES: Inter (Google Fonts) === %>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" 
+      media="print" onload="this.media='all'">
+<noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap">
+</noscript>
 
 <%# === CSS EMBUTIDO (Tailwind compilado + minificado) === %>
 <%# inlineCSS é lido do arquivo public/css/style.css no boot do app (app.js) %>
