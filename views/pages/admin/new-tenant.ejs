@@ -18,7 +18,7 @@
   <main class="flex-1 w-full max-w-4xl mx-auto p-6 space-y-8">
     
     <div class="mb-4">
-      <h1 class="text-2xl font-bold text-white">Criar Novo Cliente (Tenant)</h1>
+      <h1 class="text-2xl font-bold text-white">Criar Novo Parceiro (Tenant)</h1>
       <p class="text-gray-400 text-sm mt-1">Isso registrará a empresa no banco de dados e publicará o funil na Cloudflare (Worker) imediatamente.</p>
     </div>
 
@@ -35,20 +35,20 @@
         <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white">1. Empresa</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-1">Nome da Empresa</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Nome da Empresa</label>
             <input type="text" name="tenant_name" required placeholder="Ex: Zebra Box"
-                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-1">Slug (URL)</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Slug (URL)</label>
             <input type="text" name="tenant_slug" required placeholder="Ex: zebra-box"
-                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
             <p class="text-xs text-gray-500 mt-1">Somente letras minúsculas e traços.</p>
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-400 mb-1">WhatsApp de Destino</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">WhatsApp de Destino</label>
             <input type="text" name="whatsapp" required placeholder="Ex: 5511988887777"
-                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
             <p class="text-xs text-gray-500 mt-1">DDI + DDD + Número sem espaços. Exemplo: 5511999999999</p>
           </div>
         </div>
@@ -59,24 +59,24 @@
         <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white mt-8">2. Formulário Principal</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-1">Título do Formulário</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Título do Formulário</label>
             <input type="text" name="form_title" required placeholder="Ex: Fale com Consultor"
-                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-1">Slug do Formulário</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Slug do Formulário</label>
             <input type="text" name="form_slug" required placeholder="Ex: contato"
-                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-400 mb-1">Descrição</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Descrição</label>
             <input type="text" name="form_description" placeholder="Ex: Preencha para iniciar atendimento"
-                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
           </div>
           <div class="md:col-span-2">
-            <label class="block text-sm font-medium text-gray-400 mb-1">Mensagem Template (Para o WhatsApp)</label>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Mensagem Template (Para o WhatsApp)</label>
             <textarea name="message_template" rows="3" required placeholder="Ex: Olá! Meu nome é {{nome}} e eu vim pelo site."
-                      class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></textarea>
+                      class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors"></textarea>
             <p class="text-xs text-blue-400 mt-1">Use {{id_do_campo}} para injetar os dados respondidos, ex: {{nome}}.</p>
           </div>
         </div>
@@ -86,7 +86,7 @@
       <section>
         <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white mt-8">3. Schema dos Campos (JSON)</h2>
         <div>
-          <textarea name="fields_json" rows="6" required class="w-full bg-black border border-gray-700 text-white font-mono text-sm p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+          <textarea name="fields_json" rows="6" required class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 font-mono text-sm transition-colors">
 [
   {
     "id": "nome",
