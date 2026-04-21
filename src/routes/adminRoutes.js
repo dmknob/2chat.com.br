@@ -3,6 +3,7 @@ const express = require('express');
 const router  = express.Router();
 const db      = require('../../database/db');
 const logger  = require('../logger');
+const kvSync  = require('../services/kvSync');
 
 // Hardcoded Password Helper (MD5/Bcrypt seria melhor na V2, mas simples na V1 basta se seguro via SSL)
 const ADMIN_PASS = process.env.ADMIN_PASSWORD || '2chat2026';
@@ -98,6 +99,76 @@ router.get('/hub', requireAuth, (req, res) => {
         leadsCount,
         recentLeads
     });
+});
+
+// =============================================================================
+// GET /admin/tenants/new (Formulário Visual de Criação)
+// =============================================================================
+router.get('/tenants/new', requireAuth, (req, res) => {
+    res.render('pages/admin/new-tenant', {
+        title: 'Criar Tenant',
+        description: 'Adicionar nova empresa ao 2chat',
+        canonical: '/admin/tenants/new',
+        errorMessage: req.session.error || null
+    });
+    if (req.session) req.session.error = null;
+});
+
+// =============================================================================
+// POST /admin/tenants/new (Processamento e Sync CF)
+// =============================================================================
+router.post('/tenants/new', requireAuth, async (req, res) => {
+    const { tenant_name, tenant_slug, whatsapp, form_title, form_slug, form_description, message_template, fields_json } = req.body;
+
+    try {
+        // Valida JSON
+        let parsedFields;
+        try {
+            parsedFields = JSON.parse(fields_json);
+            if (!Array.isArray(parsedFields)) throw new Error('Schema de campos precisa ser um Array [ ]');
+        } catch (jErr) {
+            req.session.error = 'Erro no Schema JSON dos Campos: ' + jErr.message;
+            return res.redirect('/admin/tenants/new');
+        }
+
+        // Transação no SQLite
+        db.transaction(() => {
+            // Insere Tenant
+            const tenantStmt = db.prepare(`
+                INSERT OR IGNORE INTO tenants (slug, name, whatsapp, plan)
+                VALUES (?, ?, ?, 'free')
+            `);
+            tenantStmt.run(tenant_slug, tenant_name, whatsapp);
+
+            const tenant = db.prepare('SELECT id FROM tenants WHERE slug = ?').get(tenant_slug);
+
+            // Insere Form
+            const formStmt = db.prepare(`
+                INSERT OR IGNORE INTO forms
+                (tenant_id, slug, title, description, fields_json, message_template)
+                VALUES (?, ?, ?, ?, ?, ?)
+            `);
+            formStmt.run(
+                tenant.id,
+                form_slug,
+                form_title,
+                form_description || '',
+                JSON.stringify(parsedFields),
+                message_template
+            );
+        })();
+
+        // Sincroniza com a Cloudflare (Worker)
+        await kvSync.publishTenantToKV(tenant_slug);
+
+        logger.info(`Novo Tenant Criado & Sincronizado: ${tenant_slug}`);
+        res.redirect('/admin/hub');
+
+    } catch (err) {
+        logger.error('Erro ao salvar UI Tenant', { error: err.message });
+        req.session.error = 'Falha ao salvar. Verifique se o slug já existe. Erro: ' + err.message;
+        res.redirect('/admin/tenants/new');
+    }
 });
 
 module.exports = router;

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../../partials/head', { title, description, canonical, ogTitle: title, ogDesc: description }) %>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col">
+  
+  <header class="border-b border-gray-800 bg-black sticky top-0 z-10 w-full px-6 py-4 flex justify-between items-center">
+    <div class="text-xl font-extrabold text-white">
+      2chat<span class="text-blue-500">.</span> <span class="text-gray-500 text-sm ml-2 font-medium">Novo Tenant</span>
+    </div>
+    <div>
+        <a href="/admin/hub" class="text-sm text-gray-400 hover:text-white transition-colors mr-4">← Voltar</a>
+        <a href="/admin/logout" class="text-sm text-red-400 hover:text-red-300 transition-colors">Sair</a>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-4xl mx-auto p-6 space-y-8">
+    
+    <div class="mb-4">
+      <h1 class="text-2xl font-bold text-white">Criar Novo Cliente (Tenant)</h1>
+      <p class="text-gray-400 text-sm mt-1">Isso registrará a empresa no banco de dados e publicará o funil na Cloudflare (Worker) imediatamente.</p>
+    </div>
+
+    <% if (errorMessage) { %>
+      <div class="bg-red-500/10 border border-red-500/40 text-red-400 p-4 rounded-xl text-sm font-medium text-center">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <form action="/admin/tenants/new" method="POST" class="space-y-6 bg-gray-900 border border-gray-800 p-6 sm:p-8 rounded-3xl shadow-xl">
+      
+      <!-- Dados da Empresa -->
+      <section>
+        <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white">1. Empresa</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-1">Nome da Empresa</label>
+            <input type="text" name="tenant_name" required placeholder="Ex: Zebra Box"
+                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-1">Slug (URL)</label>
+            <input type="text" name="tenant_slug" required placeholder="Ex: zebra-box"
+                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+            <p class="text-xs text-gray-500 mt-1">Somente letras minúsculas e traços.</p>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-400 mb-1">WhatsApp de Destino</label>
+            <input type="text" name="whatsapp" required placeholder="Ex: 5511988887777"
+                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+            <p class="text-xs text-gray-500 mt-1">DDI + DDD + Número sem espaços. Exemplo: 5511999999999</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Dados do Formulário Primário -->
+      <section>
+        <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white mt-8">2. Formulário Principal</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-1">Título do Formulário</label>
+            <input type="text" name="form_title" required placeholder="Ex: Fale com Consultor"
+                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-1">Slug do Formulário</label>
+            <input type="text" name="form_slug" required placeholder="Ex: contato"
+                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-400 mb-1">Descrição</label>
+            <input type="text" name="form_description" placeholder="Ex: Preencha para iniciar atendimento"
+                   class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-400 mb-1">Mensagem Template (Para o WhatsApp)</label>
+            <textarea name="message_template" rows="3" required placeholder="Ex: Olá! Meu nome é {{nome}} e eu vim pelo site."
+                      class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors"></textarea>
+            <p class="text-xs text-blue-400 mt-1">Use {{id_do_campo}} para injetar os dados respondidos, ex: {{nome}}.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Campos Dinâmicos (Para simplificar no V1 do Painel, usaremos JSON cru até o V2 ter drag&drop) -->
+      <section>
+        <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white mt-8">3. Schema dos Campos (JSON)</h2>
+        <div>
+          <textarea name="fields_json" rows="6" required class="w-full bg-black border border-gray-700 text-white font-mono text-sm p-3 rounded-xl focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+[
+  {
+    "id": "nome",
+    "label": "Qual o seu nome?",
+    "type": "text",
+    "placeholder": "Seu nome",
+    "required": true
+  }
+]
+          </textarea>
+          <p class="text-xs text-gray-500 mt-1">Por enquanto modifique o JSON puro. A versão V2 trará construtor arrastar-e-soltar.</p>
+        </div>
+      </section>
+
+      <div class="pt-4 border-t border-gray-800 flex justify-end">
+        <button type="submit"
+                class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-all disabled:opacity-50"
+                onclick="this.innerText='Publicando...';">
+          Gerar & Publicar na Edge
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <%- include('../../partials/footer') %>
+</body>
+</html>
