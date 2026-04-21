@@ -80,7 +80,8 @@ router.get('/logout', (req, res) => {
 router.get('/hub', requireAuth, (req, res) => {
     // Busca dados analíticos rápidos
     const parceirosCount = db.prepare('SELECT count(*) as total FROM parceiros WHERE is_active = 1').get().total;
-    const leadsCount   = db.prepare('SELECT count(*) as total FROM leads').get().total;
+    const leadsCount     = db.prepare('SELECT count(*) as total FROM leads').get().total;
+    const waitlistCount  = db.prepare('SELECT count(*) as total FROM waitlist').get().total;
     
     // Busca últimos 50 leads
     const recentLeads = db.prepare(`
@@ -97,7 +98,22 @@ router.get('/hub', requireAuth, (req, res) => {
         canonical: '/admin/hub',
         parceirosCount,
         leadsCount,
+        waitlistCount,
         recentLeads
+    });
+});
+
+// =============================================================================
+// GET /admin/waitlist (Lista de Alfas/Waitlist)
+// =============================================================================
+router.get('/waitlist', requireAuth, (req, res) => {
+    const list = db.prepare('SELECT * FROM waitlist ORDER BY created_at DESC').all();
+
+    res.render('pages/admin/waitlist', {
+        title: 'Waitlist',
+        description: 'Interessados no Beta do 2chat',
+        canonical: '/admin/waitlist',
+        list
     });
 });
 
