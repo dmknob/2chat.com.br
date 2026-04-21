@@ -1,99 +1,145 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <%- include('../../partials/head', {
-    title, description, canonical, ogTitle, ogDesc,
-    schemaJson: JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "mainEntityOfPage": {
-        "@type": "WebPage",
-        "@id": "https://2chat.com.br" + canonical
-      },
-      "headline": title,
-      "description": description,
-      "author": {
-        "@type": "Organization",
-        "name": "Equipe 2chat",
-        "url": "https://2chat.com.br"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "2chat",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "https://2chat.com.br/img/og-image.png"
-        }
-      },
-      "datePublished": "2026-04-21T00:00:00+00:00",
-      "dateModified": "2026-04-21T00:00:00+00:00"
-    })
-  }) %>
-  <style>
-    body { background: #0a0a0a; font-family: 'Inter', sans-serif; }
-    .prose h2 { color: #fff; font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
-    .prose h3 { color: #e5e5e5; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
-    .prose p { color: #a3a3a3; line-height: 1.75; margin-bottom: 1.25rem; font-size: 1.05rem; }
-    .prose ul { color: #a3a3a3; list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; }
-    .prose li { margin-bottom: 0.5rem; }
-    .prose strong { color: #fff; }
-    .glass-card { background: rgba(17,17,17,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(55,55,55,0.3); }
-  </style>
+  <%- include('../../partials/head', { title, description, canonical, ogTitle, ogDesc, schemaJson:
+    JSON.stringify({ "@context" : "https://schema.org" , "@type" : "BlogPosting" , "mainEntityOfPage" : { "@type"
+    : "WebPage" , "@id" : "https://2chat.com.br" + canonical }, "headline" : title, "description" :
+    description, "author" : { "@type" : "Organization" , "name" : "Equipe 2chat" , "url" : "https://2chat.com.br"
+    }, "publisher" : { "@type" : "Organization" , "name" : "2chat" , "logo" : { "@type" : "ImageObject" , "url"
+    : "https://2chat.com.br/img/og-image.png" } }, "datePublished" : "2026-04-21T00:00:00+00:00" , "dateModified"
+    : "2026-04-21T00:00:00+00:00" }) }) %>
+    <style>
+      body {
+        background: #0a0a0a;
+        font-family: 'Inter', sans-serif;
+      }
+
+      .prose h2 {
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      .prose h3 {
+        color: #e5e5e5;
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+
+      .prose p {
+        color: #a3a3a3;
+        line-height: 1.75;
+        margin-bottom: 1.25rem;
+        font-size: 1.05rem;
+      }
+
+      .prose ul {
+        color: #a3a3a3;
+        list-style-type: disc;
+        padding-left: 1.5rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .prose li {
+        margin-bottom: 0.5rem;
+      }
+
+      .prose strong {
+        color: #fff;
+      }
+
+      .glass-card {
+        background: rgba(17, 17, 17, 0.8);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(55, 55, 55, 0.3);
+      }
+    </style>
 </head>
+
 <body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col items-center">
 
   <nav class="w-full max-w-3xl mx-auto px-6 py-8 flex justify-between items-center border-b border-gray-800">
-      <a href="/" class="text-2xl font-extrabold text-white tracking-tight">2chat<span class="text-blue-500">.</span></a>
-      <a href="/artigos" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">← Artigos</a>
+    <a href="/" class="text-2xl font-extrabold text-white tracking-tight">2chat<span class="text-blue-500">.</span></a>
+    <a href="/artigos" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">← Artigos</a>
   </nav>
 
   <main class="w-full max-w-3xl px-6 py-12 flex-1 shrink-0">
-    
+
     <header class="mb-12">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider mb-6">
-            Estratégia Definitiva
-        </div>
-        <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Como parar de perder tempo respondendo curiosos no WhatsApp Business?</h1>
-        <p class="text-xl text-gray-400 leading-relaxed">Descubra a tática simples que profissionais usam para filtrar clientes e garantir que apenas pessoas dispostas a pagar cheguem até o chat.</p>
-        
-        <div class="flex items-center gap-4 mt-8 border-t border-gray-800 pt-6">
-            <div class="text-sm text-gray-500">Publicado por <strong class="text-gray-300">Equipe 2chat</strong> • 3 min de leitura</div>
-        </div>
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider mb-6">
+        Estratégia Definitiva
+      </div>
+      <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">Como parar de perder tempo
+        respondendo curiosos no WhatsApp Business?</h1>
+      <p class="text-xl text-gray-400 leading-relaxed">Descubra a tática simples que profissionais usam para filtrar
+        clientes e garantir que apenas pessoas dispostas a pagar cheguem até o chat.</p>
+
+      <div class="flex items-center gap-4 mt-8 border-t border-gray-800 pt-6">
+        <div class="text-sm text-gray-500">Publicado por <strong class="text-gray-300">Equipe 2chat</strong> • 3 min de
+          leitura</div>
+      </div>
     </header>
 
     <article class="prose max-w-none">
-        <p>Se você tem um pequeno negócio e usa o WhatsApp Business como seu principal canal de vendas, você já conhece a dor: o celular vibra, você para o que está fazendo, corre para responder, e percebe que é só alguém perguntando "qual o valor?" e que desaparece logo depois.</p>
+      <p>Se você tem um pequeno negócio e usa o WhatsApp Business como seu principal canal de vendas, você já conhece a
+        dor: o celular vibra, você para o que está fazendo, corre para responder, e percebe que é só alguém perguntando
+        "qual o valor?" e que desaparece logo depois.</p>
 
-        <p>A dura realidade é que <strong>os "curiosos" estão sugando o seu bem mais precioso: o seu tempo.</strong> Um corretor de imóveis perde horas diárias mandando catálogos para quem não tem limite aprovado. Um dentista para o atendimento presencial para dar orçamentos que nunca convertem. Um arquiteto passa horas desenhando escopos baseados em três mensagens trocadas com alguém que sumirá na semana seguinte.</p>
+      <p>A dura realidade é que <strong>os "curiosos" estão sugando o seu bem mais precioso: o seu tempo.</strong> Um
+        corretor de imóveis perde horas diárias mandando catálogos para quem não tem limite aprovado. Um dentista para o
+        atendimento presencial para dar orçamentos que nunca convertem. Um arquiteto passa horas desenhando escopos
+        baseados em três mensagens trocadas com alguém que sumirá na semana seguinte.</p>
 
-        <h2>Por que isso acontece?</h2>
-        <p>O problema não é o cliente. O problema é que <strong>a barreira de entrada do seu WhatsApp é baixa demais</strong>. O "Link na Bio" do Instagram ou o botão do anúncio manda a pessoa direto para a conversa, com um simples "Olá". Você então é forçado a assumir o papel de robô qualificador, repetindo as mesmas 5 perguntas para descobrir se o lead tem o orçamento, o prazo ou a verdadeira intenção de compra daquele serviço/produto.</p>
+      <h2>Por que isso acontece?</h2>
+      <p>O problema não é o cliente. O problema é que <strong>a barreira de entrada do seu WhatsApp é baixa
+          demais</strong>. O "Link na Bio" do Instagram ou o botão do anúncio manda a pessoa direto para a conversa, com
+        um simples "Olá". Você então é forçado a assumir o papel de robô qualificador, repetindo as mesmas 5 perguntas
+        para descobrir se o lead tem o orçamento, o prazo ou a verdadeira intenção de compra daquele serviço/produto.
+      </p>
 
-        <h2>Como filtrar clientes automaticamente no WhatsApp?</h2>
-        <p>Você não pode diminuir o tráfego, mas pode aumentar a sua "régua de corte". Exigindo do cliente um pequeno esforço antes de poder falar com você.</p>
-        
-        <h3>1. Não coloque seu número direto na Bio</h3>
-        <p>Colocar o link direto para o WhatsApp atrai volume, mas destrói a qualidade. Profissionais que valorizam o próprio tempo substituem o link direto por uma <strong>página de triagem</strong> (ou formulário de qualificação).</p>
+      <h2>Como filtrar clientes automaticamente no WhatsApp?</h2>
+      <p>Você não pode diminuir o tráfego, mas pode aumentar a sua "régua de corte". Exigindo do cliente um pequeno
+        esforço antes de poder falar com você.</p>
 
-        <h3>2. Faça as perguntas difíceis antes do chat abrir</h3>
-        <p>O que você demoraria 15 minutos perguntando no meio da conversa, pergunte de uma vez em um formulário obrigatório antes do lead acessar o seu WhatsApp. Exemplos:</p>
-        <ul>
-            <li>"Qual o seu prazo de mudança?" (Para Corretores)</li>
-            <li>"Você já possui o plano de saúde ou é consulta particular?" (Clínicas e Dentistas)</li>
-            <li>"Possui orçamento de X mil reais destinado a esse projeto?" (Arquitetos, Agências de Marketing)</li>
-        </ul>
+      <h3>1. Não coloque seu número direto na Bio</h3>
+      <p>Colocar o link direto para o WhatsApp atrai volume, mas destrói a qualidade. Profissionais que valorizam o
+        próprio tempo substituem o link direto por uma <strong>página de triagem</strong> (ou formulário de
+        qualificação).</p>
 
-        <h3>3. Efeito Repelente</h3>
-        <p>Ao exigir o preenchimento de três ou quatro perguntas, acontece a verdadeira mágica: <strong>os curiosos não preenchem</strong>. Quem quer apenas especular fecha a aba. Mas quem realmente precisa do seu serviço preenche com atenção.</p>
+      <h3>2. Faça as perguntas difíceis antes do chat abrir</h3>
+      <p>O que você demoraria 15 minutos perguntando no meio da conversa, pergunte de uma vez em um formulário
+        obrigatório antes do lead acessar o seu WhatsApp. Exemplos:</p>
+      <ul>
+        <li>"Qual o seu prazo de mudança?" (Para Corretores)</li>
+        <li>"Você já possui o plano de saúde ou é consulta particular?" (Clínicas e Dentistas)</li>
+        <li>"Possui orçamento de X mil reais destinado a esse projeto?" (Arquitetos, Agências de Marketing)</li>
+      </ul>
 
-        <h2>O Resultado: Você fecha mais vendas com menos contatos</h2>
-        <p>Em vez de atender 50 pessoas por dia com mensagens rasas, você passará a receber 15 mensagens extremamente completas. E o mais poderoso: quando a primeira mensagem o cliente chegar no WhatsApp, você já sabe exatamente o que ele precisa e, em muitos casos, já sabe que ele tem o capital disposta a investir. Você não precisa mais "quebrar gelo"; você só precisa fechar a venda.</p>
+      <h3>3. Efeito Repelente</h3>
+      <p>Ao exigir o preenchimento de três ou quatro perguntas, acontece a verdadeira mágica: <strong>os curiosos não
+          preenchem</strong>. Quem quer apenas especular fecha a aba. Mas quem realmente precisa do seu serviço preenche
+        com atenção.</p>
+
+      <h2>O Resultado: Você fecha mais vendas com menos contatos</h2>
+      <p>Em vez de atender 50 pessoas por dia com mensagens rasas, você passará a receber 15 mensagens extremamente
+        completas. E o mais poderoso: quando a primeira mensagem do cliente chegar no WhatsApp, você já sabe exatamente
+        o que ele precisa e, em muitos casos, já sabe que ele tem o capital e está disposto a investir. Você não precisa
+        mais "quebrar gelo"; você só precisa fechar a venda.</p>
     </article>
 
     <div class="mt-12 glass-card p-8 rounded-3xl text-center">
-        <h3 class="text-2xl font-bold text-white mb-4">Crie sua barreira anticonsultor agora.</h3>
-        <p class="text-gray-400 mb-6">O 2chat é exatamente essa camada de inteligência. Crie o seu link de qualificação em menos de 1 minuto, gratuito, e só atenda quem quer comprar.</p>
-        <a href="/" class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-all">Ver como o 2chat funciona</a>
+      <h3 class="text-2xl font-bold text-white mb-4">Crie sua barreira anticonsultor agora.</h3>
+      <p class="text-gray-400 mb-6">O 2chat é exatamente essa camada de inteligência. Crie o seu link de qualificação em
+        menos de 1 minuto, gratuito, e só atenda quem quer comprar.</p>
+      <a href="/"
+        class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-all">Ver
+        como o 2chat funciona</a>
     </div>
 
   </main>
@@ -101,4 +147,5 @@
   <%- include('../../partials/footer') %>
 
 </body>
+
 </html>
