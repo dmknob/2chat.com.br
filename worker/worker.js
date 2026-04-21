@@ -292,103 +292,105 @@ const SHARED_HEAD = `
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- Carregamento de fonte não-bloqueante (técnica de alta performance) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" 
+        media="print" onload="this.media='all'">
+  <noscript>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap">
+  </noscript>
+
   <style>
     /* Reset & Base */
     *, *::before, *::after { box-sizing: border-box; }
     body { 
-      font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #e5e7eb; 
+      font-family: 'Inter', system-ui, -apple-system, sans-serif; 
+      background-color: #0a0a0a; color: #e5e7eb; 
       margin: 0; -webkit-font-smoothing: antialiased; line-height: 1.5;
     }
     a { color: inherit; text-decoration: none; }
     
-    /* Layout */
+    /* Typography & Contrast Fixes */
+    .text-blue-500 { color: #60a5fa !important; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(96, 165, 250, 0.3); }
+    .text-blue-400 { color: #60a5fa !important; }
+    .text-gray-200 { color: #e5e7eb !important; }
+    .text-gray-300 { color: #d1d5db !important; }
+    .text-gray-400 { color: #9ca3af !important; }
+    .text-gray-500 { color: #9ca3af !important; }
+    .text-gray-600 { color: #d1d5db !important; }
+    .text-white { color: #ffffff !important; }
+    .text-red-500 { color: #ef4444 !important; }
+    .text-red-400 { color: #f87171 !important; }
+    
+    /* Layout Utilities */
     .flex { display: flex; }
     .flex-col { flex-direction: column; }
     .items-center { align-items: center; }
     .items-start { align-items: flex-start; }
     .justify-center { justify-content: center; }
     .justify-between { justify-content: space-between; }
+    .text-center { text-align: center; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
     .w-full { width: 100%; }
     .max-w-md { max-width: 28rem; }
-    .mx-auto { margin-left: auto; margin-right: auto; }
     .min-h-screen { min-height: 100vh; }
-    .overflow-hidden { overflow: hidden; }
     
     /* Spacing */
     .p-3 { padding: 0.75rem; } .p-4 { padding: 1rem; } .p-5 { padding: 1.25rem; } 
     .px-4 { padding-left: 1rem; padding-right: 1rem; }
     .py-4 { padding-top: 1rem; padding-bottom: 1rem; } .py-5 { padding-top: 1.25rem; padding-bottom: 1.25rem; }
-    .py-8 { padding-top: 2rem; padding-bottom: 2rem; } .py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
+    .py-10 { padding-top: 2.5rem; padding-bottom: 2.5rem; }
     .mb-1 { margin-bottom: 0.25rem; } .mb-2 { margin-bottom: 0.5rem; } .mb-3 { margin-bottom: 0.75rem; }
     .mb-4 { margin-bottom: 1rem; } .mb-6 { margin-bottom: 1.5rem; } .mb-7 { margin-bottom: 1.75rem; }
     .mt-1 { margin-top: 0.25rem; } .-mt-1 { margin-top: -0.25rem; }
-    .gap-1 { gap: 0.25rem; } .gap-2 { gap: 0.5rem; } .gap-3 { gap: 0.75rem; } .gap-4 { gap: 1rem; }
-    .space-y-2 > * + * { margin-top: 0.5rem; }
+    .gap-1 { gap: 0.25rem; } .gap-4 { gap: 1rem; }
     
-    /* Typography */
-    .text-center { text-align: center; }
+    /* Typography Size & Weight */
     .text-xs { font-size: 0.75rem; } .text-sm { font-size: 0.875rem; } .text-base { font-size: 1rem; }
-    .text-lg { font-size: 1.125rem; } .text-xl { font-size: 1.25rem; } .text-2xl { font-size: 1.5rem; }
+    .text-xl { font-size: 1.25rem; } .text-2xl { font-size: 1.5rem; }
     .font-medium { font-weight: 500; } .font-semibold { font-weight: 600; }
     .font-bold { font-weight: 700; } .font-extrabold { font-weight: 800; }
     .tracking-tight { letter-spacing: -0.025em; }
     
-    /* Colors (Lighthouse Contrast Fixed) */
-    .text-white { color: #ffffff !important; }
-    .text-gray-200 { color: #e5e7eb !important; }
-    .text-gray-300 { color: #d1d5db !important; }
-    .text-gray-400 { color: #9ca3af !important; }
-    .text-gray-500 { color: #9ca3af !important; } /* Aumentado para contraste */
-    .text-gray-600 { color: #d1d5db !important; } /* Aumentado para contraste */
-    .text-blue-400 { color: #60a5fa !important; }
-    .text-blue-500 { color: #3b82f6 !important; }
-    .text-red-400 { color: #f87171 !important; }
-    .text-red-500 { color: #ef4444 !important; }
-    
-    /* Borders */
+    /* Borders & Rounding */
     .border { border: 1px solid #374151; }
     .border-b { border-bottom: 1px solid #1f2937; }
     .border-t { border-top: 1px solid #1f2937; }
     .border-gray-700 { border-color: #374151; }
     .border-gray-800 { border-color: #1f2937; }
+    .border-red-500\/40 { border-color: rgba(239, 68, 68, 0.4); }
     .rounded-xl { border-radius: 0.75rem; }
     .rounded-2xl { border-radius: 1rem; }
     
-    /* Interactive */
-    .transition-all { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-    .transition-colors { transition: color 0.15s; }
-    .hover\:opacity-80:hover { opacity: 0.8; }
-    .hover\:underline:hover { text-decoration: underline; }
-    .hover\:text-blue-400:hover { color: #60a5fa !important; }
-    .hover\:text-gray-300:hover { color: #d1d5db !important; }
-    
-    /* Components Specifics */
-    .card-form { background: #111; cursor: pointer; }
-    .card-form:hover { box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.5); border-color: #3b82f6; }
-    .field-ctrl { background: #000; outline: none; }
-    .field-ctrl:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3); }
-    .btn-wa { background: #2563eb; color: white; border: none; cursor: pointer; transition: transform 0.15s; }
+    /* Interactive Components */
+    .card-form { background: #111; cursor: pointer; border: 1px solid #1f2937; }
+    .card-form:hover { box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.5); border-color: #60a5fa; }
+    .field-ctrl { background: #000; outline: none; border: 1px solid #374151; }
+    .field-ctrl:focus { border-color: #60a5fa; box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3); }
+    .btn-wa { background: #2563eb; color: white; border: none; cursor: pointer; transition: transform 0.15s, background-color 0.2s; }
     .btn-wa:hover { background: #1d4ed8; transform: translateY(-1px); }
     .btn-wa:active { transform: translateY(0); }
-    select option { background-color: #000; color: white; }
-    
     .bg-red-500\/10 { background-color: rgba(239, 68, 68, 0.1); }
-    .border-red-500\/40 { border-color: rgba(239, 68, 68, 0.4); }
+    
+    .transition-all { transition: all 0.2s; }
+    .hover\:opacity-80:hover { opacity: 0.8; }
+    .hover\:underline:hover { text-decoration: underline; }
+    select option { background-color: #000; color: white; }
   </style>
 `;
 
 const LOGO = `
   <a href="/" aria-label="2chat — página inicial"
      class="text-xl font-extrabold tracking-tight text-white hover:opacity-80 transition-all">
-    2chat<span class="text-blue-500">.</span>
+    2chat<span class="text-blue-400">.</span>
   </a>
 `;
 
 function baseLayout({ title, metaDesc, content, backHref = null, backLabel = null }) {
   const backLink = backHref
     ? `<a href="${backHref}"
-          class="inline-flex items-center gap-1 text-sm text-gray-500 hover:text-gray-300 transition-all mb-6">
+          class="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-white transition-all mb-6"
+          style="text-decoration: underline; text-underline-offset: 4px;">
           ← ${backLabel || "Voltar"}
        </a>`
     : "";
@@ -402,7 +404,7 @@ function baseLayout({ title, metaDesc, content, backHref = null, backLabel = nul
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <header class="border-b border-gray-800 py-4 px-4 overflow-hidden">
+  <header class="border-b border-gray-800 py-4 px-4">
     <div class="max-w-md mx-auto">${LOGO}</div>
   </header>
 
@@ -415,13 +417,14 @@ function baseLayout({ title, metaDesc, content, backHref = null, backLabel = nul
 
   <footer class="border-t border-gray-800 py-5 px-4 text-center">
     <p class="text-xs text-gray-500">
-      Powered by <a href="/" class="text-blue-500 hover:underline">2chat</a>
+      Powered by <a href="/" class="text-blue-400 hover:underline" style="text-decoration: underline; text-underline-offset: 2px;">2chat</a>
     </p>
   </footer>
 
 </body>
 </html>`;
 }
+
 
 // ─── RENDERIZADORES ───────────────────────────────────────────────────────────
 
