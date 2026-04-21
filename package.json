@@ -14,6 +14,7 @@
     "db:dump": "node scripts/dump-db.js",
     "db:restore": "node scripts/restore-db.js",
     "kv:sync": "node scripts/sync-kv.js",
+    "kv:drain": "node scripts/drain-kv.js",
     "worker:deploy": "cd worker && npx wrangler deploy",
     "worker:dev": "cd worker && npx wrangler dev worker.js --local-upstream http://localhost:3010"
   },

@@ -254,9 +254,9 @@ async function logLead(leadData, env) {
 
   } catch {
     // VPS offline, timeout (> 400ms) ou erro → buffer no 2CHAT_LEADS_KV
-    if (env?.LEADS_KV) {
+    if (env?.['2CHAT_LEADS_KV']) {
       const kvKey = `lead:${Date.now()}:${Math.random().toString(36).slice(2, 9)}`;
-      await env.LEADS_KV.put(kvKey, JSON.stringify(leadData), {
+      await env['2CHAT_LEADS_KV'].put(kvKey, JSON.stringify(leadData), {
         expirationTtl: 60 * 60 * 24 * 7, // TTL: 7 dias (auto-expiração)
       });
       // ✅ Lead inclui city/region/country mesmo no buffer
