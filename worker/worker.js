@@ -223,7 +223,10 @@ async function handleSubmit(request, tenant, form, env, ctx) {
 // ─── LOGGING DO LEAD → VPS com fallback KV ────────────────────────────────────
 
 async function logLead(leadData, env) {
-  const VPS_ENDPOINT = "https://2chat.com.br/api/leads";
+  // Em produção usa a URL real; em dev usa o local-upstream (Express)
+  const API_ENDPOINT = env.ENVIRONMENT === 'production'
+    ? 'https://2chat.com.br/api/leads'
+    : 'http://localhost:3010/api/leads';
 
   try {
     // Tentativa síncrona no VPS com timeout de 400ms
