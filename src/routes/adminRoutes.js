@@ -13,8 +13,17 @@ function requireAuth(req, res, next) {
         res.locals.isAdmin = true;
         return next();
     }
+    // Salva a página que o usuário tentou acessar
+    req.session.returnTo = req.originalUrl;
     return res.redirect('/admin/login');
 }
+
+// =============================================================================
+// GET /admin ou /admin/
+// =============================================================================
+router.get('/', (req, res) => {
+    res.redirect('/admin/hub');
+});
 
 // =============================================================================
 // GET /admin/login
@@ -43,7 +52,12 @@ router.post('/login', (req, res) => {
     if (password === ADMIN_PASS) {
         req.session.isAdmin = true;
         logger.info('Admin login efetuado via Hub', { ip: req.ip });
-        return res.redirect('/admin/hub');
+        
+        // Puxa a URL salva (se houver) e limpa
+        const returnTo = req.session.returnTo || '/admin/hub';
+        delete req.session.returnTo;
+        
+        return res.redirect(returnTo);
     }
     
     req.session.error = 'Senha incorreta. Tente novamente.';
@@ -56,7 +70,7 @@ router.post('/login', (req, res) => {
 // =============================================================================
 router.get('/logout', (req, res) => {
     req.session.destroy();
-    res.redirect('/admin/login');
+    res.redirect('/');
 });
 
 // =============================================================================
