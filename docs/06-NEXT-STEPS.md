@@ -17,10 +17,6 @@ O `2chat` caminha para uma oferta de SaaS estruturada. Atualmente administramos 
   - Tela iterativa para configurar o "nome", o "slug" (ex: "perito-forense"), número de "whatsapp".
   - Campo gerador de form field types e custom tags para preencher o Worker JSON sem tocar em código.
 
-## 3. SEO Expandido
-- **Aperfeiçoamento da Landing Page:**
-  - Criação de clusters semânticos (artigos curtos tipo "Zebra Box", "Aluguel de Container") para indexação profunda no diretório orgânico. 
-
 ## 4. Integrações
 - Opção para disparar um webhook para o parceiro que usar um software CRM próprio (ex: RD Station, Pipiedrive), quando nós capturamos o Lead pelo nosso formulário Edge.
 

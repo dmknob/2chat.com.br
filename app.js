@@ -8,10 +8,25 @@ const fs          = require('fs');
 const compression = require('compression');
 const helmet      = require('helmet');
 const morgan      = require('morgan');
+const session     = require('express-session');
 const logger      = require('./src/logger');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// Configuração de Sessão para a Admin Area
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'fallback-secret-12345',
+    resave: false,
+    saveUninitialized: false,
+    name: '2chat.sid',
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        httpOnly: true,
+        sameSite: 'lax',
+        maxAge: 1000 * 60 * 60 * 24 // 24 Horas
+    }
+}));
 
 // =============================================================================
 // 1. Configurações de proxy e segurança básica
@@ -103,8 +118,10 @@ app.use(express.static(path.join(__dirname, 'public'), {
 // =============================================================================
 const publicRoutes = require('./src/routes/publicRoutes');
 const apiRoutes    = require('./src/routes/apiRoutes');
+const adminRoutes  = require('./src/routes/adminRoutes');
 
 app.use('/api', apiRoutes);
+app.use('/admin', adminRoutes);
 app.use('/', publicRoutes);
 
 // =============================================================================

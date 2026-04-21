@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../../partials/head', { title, description, canonical, ogTitle: title, ogDesc: description }) %>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col justify-center items-center px-4">
+  
+  <main class="w-full max-w-sm space-y-6">
+    <div class="text-center mb-8">
+      <h1 class="text-4xl font-extrabold text-white tracking-tight">Admin</h1>
+      <p class="text-sm text-gray-400 mt-2">Área restrita 2chat.</p>
+    </div>
+
+    <% if (errorMessage) { %>
+      <div class="bg-red-500/10 border border-red-500/40 text-red-400 p-4 rounded-xl text-sm font-medium text-center">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <form action="/admin/login" method="POST" class="bg-gray-900 border border-gray-800 p-6 rounded-2xl shadow-xl space-y-4">
+      
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-400 mb-1">Senha de Acesso</label>
+        <input type="password" id="password" name="password" required autofocus
+               class="w-full bg-black border border-gray-700 text-white p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-colors">
+      </div>
+
+      <button type="submit"
+              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl transition-all">
+        Entrar
+      </button>
+
+    </form>
+    
+    <div class="text-center">
+        <a href="/" class="text-xs text-gray-500 hover:text-white transition-colors">Voltar para o site</a>
+    </div>
+
+  </main>
+
+  <%- include('../../partials/cookie-banner') %>
+</body>
+</html>
