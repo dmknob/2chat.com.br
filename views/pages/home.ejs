@@ -2,17 +2,7 @@
 <html lang="pt-BR">
 <head>
   <%- include('../partials/head', {
-    title, description, canonical, ogTitle, ogDesc,
-    schemaJson: JSON.stringify({
-      "@context":           "https://schema.org",
-      "@type":              "SoftwareApplication",
-      "name":               "2chat",
-      "url":                BASE_URL,
-      "applicationCategory":"BusinessApplication",
-      "description":        description,
-      "operatingSystem":    "Web",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" }
-    })
+    title, description, canonical, ogTitle, ogDesc, schemaJson
   }) %>
   <style>
     body {
@@ -21,7 +11,13 @@
       font-family: 'Inter', sans-serif;
     }
     .gradient-text {
-      background: linear-gradient(135deg, #ffffff 0%, #e5e5e5 100%);
+      background: linear-gradient(135deg, #ffffff 0%, #a3a3a3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-blue {
+      background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -33,132 +29,170 @@
     }
     @keyframes float {
       0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-10px); }
+      50%       { transform: translateY(-8px); }
     }
     .floating { animation: float 6s ease-in-out infinite; }
-    @keyframes pulse-glow {
-      from { box-shadow: 0 0 20px rgba(0,102,255,0.3); }
-      to   { box-shadow: 0 0 30px rgba(0,102,255,0.5); }
-    }
-    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite alternate; }
     .hover-lift { transition: all 0.3s cubic-bezier(0.4,0,0.2,1); }
-    .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .hover-lift:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); border-color: rgba(96, 165, 250, 0.3); }
+    
+    /* FAQ Accordion */
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
   </style>
 </head>
-<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col justify-center items-center px-4 py-8">
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col items-center">
 
-  <%# Header simplificado para a landing (logo apenas) %>
-  <header class="w-full max-w-md mx-auto mb-12 text-center">
-    <h1 class="text-5xl md:text-6xl font-extrabold gradient-text mb-4 tracking-tight floating">
-      2chat<span class="text-blue-500">.</span>
-    </h1>
-    <p class="text-gray-400 text-lg md:text-xl leading-relaxed">
-      A inteligência entre o seu link e a sua conversa.
-    </p>
-  </header>
+  <%# Navbar / Logo %>
+  <nav class="w-full max-w-5xl mx-auto px-6 py-8 flex justify-between items-center">
+      <a href="/" class="text-2xl font-extrabold text-white tracking-tight">2chat<span class="text-blue-500">.</span></a>
+      <a href="/artigos" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">Guias e Artigos</a>
+  </nav>
 
-  <main class="max-w-md w-full space-y-8" id="main-content">
+  <main class="w-full max-w-5xl px-6 space-y-24 pb-24" id="main-content">
 
-    <%# Hero Card %>
-    <section class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl hover-lift pulse-glow"
-             aria-label="Proposta de valor">
-      <div class="text-center space-y-6">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-500/20 rounded-full mb-4"
-             aria-hidden="true">
-          <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
-        </div>
-        <h2 class="text-2xl md:text-3xl font-bold text-white mb-4 leading-tight">
-          Qualifique leads em tempo real
-        </h2>
-        <p class="text-gray-300 text-base md:text-lg leading-relaxed">
-          Automatize a triagem, crie links inteligentes e converta
-          mais no WhatsApp com formulários de qualificação em segundos.
-        </p>
+    <%# Hero Section: A Dor Imediata %>
+    <section class="text-center pt-10 md:pt-20 max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-wider mb-8">
+        Vagas Limitadas para o Beta Fechado
       </div>
-    </section>
+      <h1 class="text-4xl md:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+        Pare de perder <span class="gradient-blue">10 minutos</span> no WhatsApp com quem não vai comprar.
+      </h1>
+      <p class="text-gray-400 text-lg md:text-xl leading-relaxed mb-10">
+        O 2chat é o filtro inteligente que barra curiosos e só deixa chegar no seu WhatsApp quem realmente está pronto para fechar negócio.
+      </p>
 
-    <%# Waitlist Form %>
-    <section class="glass-card rounded-3xl p-8 md:p-10 shadow-2xl hover-lift"
-             aria-label="Entrar na lista de espera do beta">
-      <div class="text-center space-y-6">
-        <h2 class="text-xl md:text-2xl font-semibold text-white mb-2">
-          🚀 Junte-se ao Beta
-        </h2>
-        <p class="text-gray-400 text-sm md:text-base leading-relaxed">
-          Seja um dos primeiros a testar a revolução na qualificação de leads.
-        </p>
-
-        <form id="betaForm" class="space-y-6" novalidate>
-          <div class="space-y-2 text-left">
-            <label for="betaEmail" class="block text-sm font-medium text-gray-300">
-              Seu melhor e-mail
-            </label>
-            <input type="email" id="betaEmail" name="email"
-                   placeholder="exemplo@email.com" required autocomplete="email"
-                   class="w-full bg-gray-950/50 border border-gray-700 text-white p-4 rounded-xl
-                          focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20
-                          transition-all duration-300 placeholder-gray-500 hover:border-gray-600">
-          </div>
-
-          <%# Honeypot — invisível para humanos, armadilha para bots %>
-          <input type="text" name="honeypot"
-                 style="position:absolute;left:-9999px;opacity:0;pointer-events:none"
-                 tabindex="-1" autocomplete="off" aria-hidden="true">
-
-          <button type="submit" id="betaSubmit"
-                  class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700
-                         text-white font-bold p-4 rounded-xl transition-all duration-300
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900
-                         disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95">
-            <span class="flex items-center justify-center gap-2">
-              <span>Entrar na lista de espera</span>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
-              </svg>
-            </span>
-          </button>
+      <%# Waitlist Call to Action %>
+      <div class="glass-card rounded-2xl p-2 md:p-3 shadow-2xl flex flex-col md:flex-row gap-3 max-w-xl mx-auto">
+        <form id="betaForm" class="flex-1 flex flex-col md:flex-row gap-3 w-full" novalidate>
+            <input type="email" id="betaEmail" name="email" placeholder="O seu melhor e-mail" required
+                   class="flex-1 bg-transparent border border-gray-700 md:border-transparent text-white px-4 py-3 md:py-0 rounded-xl focus:outline-none focus:border-blue-500 transition-colors">
+            
+            <input type="text" name="honeypot" style="display:none" tabindex="-1" autocomplete="off" aria-hidden="true">
+            
+            <button type="submit" id="betaSubmit"
+                    class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-6 py-3 rounded-xl transition-all whitespace-nowrap">
+              Entrar no Beta
+            </button>
         </form>
+      </div>
+      <div id="betaMsg" class="hidden mt-4 text-sm font-medium" role="alert"></div>
+    </section>
 
-        <div id="betaMsg" class="hidden p-4 rounded-xl border text-sm font-medium" role="alert"></div>
+    <%# Seção: O Custo do Curioso (Sintomas) %>
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-3xl font-bold text-white mb-4 leading-tight">Você sabe quanto custa responder um "só dando uma olhadinha"?</h2>
+        <p class="text-gray-400 mb-6 leading-relaxed">
+            Seja você um corretor de imóveis, um dentista ou prestador de serviços, a matemática é cruel: cada orçamento passado para alguém que não tem o perfil de compra suga sua energia, tira o foco dos clientes pagantes e atrasa sua operação.
+        </p>
+        <ul class="space-y-4">
+            <li class="flex items-start gap-3">
+                <svg class="w-6 h-6 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-gray-300">Mensagens genéricas de "Qual o valor?"</span>
+            </li>
+            <li class="flex items-start gap-3">
+                <svg class="w-6 h-6 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-gray-300">Pessoas sem limite de cartão pedindo orçamento complexo.</span>
+            </li>
+            <li class="flex items-start gap-3">
+                <svg class="w-6 h-6 text-red-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-gray-300">Tempo perdido que deveria ser usado executando o seu serviço.</span>
+            </li>
+        </ul>
+      </div>
+      <div class="glass-card rounded-3xl p-8 border-red-500/20 relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10">
+            <svg class="w-24 h-24 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <p class="text-xl font-medium text-gray-200 italic relative z-10">"Eu chegava a atender 40 pessoas por dia no WhatsApp. No final do mês, fechava 3 serviços. Eu não precisava de mais tráfego, eu precisava de um repelente de curiosos."</p>
       </div>
     </section>
 
-    <%# Features Grid %>
-    <section class="grid grid-cols-1 md:grid-cols-3 gap-4" aria-label="Diferenciais">
-      <article class="glass-card rounded-2xl p-6 text-center hover-lift">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-green-500/20 rounded-full mb-4">
-          <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
+    <%# Seção: Como Funciona (A Solução) %>
+    <section class="space-y-12">
+        <div class="text-center max-w-2xl mx-auto">
+            <h2 class="text-3xl font-bold text-white mb-4">Como o 2chat qualifica seus leads</h2>
+            <p class="text-gray-400">Instale uma barreira de inteligência. Mude seu link da bio ou de campanhas para o 2chat.</p>
         </div>
-        <h3 class="text-lg font-semibold text-white mb-2">Resiliente</h3>
-        <p class="text-gray-400 text-sm">Nunca perde um lead, mesmo se o servidor cair.</p>
-      </article>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="glass-card rounded-3xl p-8 hover-lift">
+                <div class="text-4xl mb-4 font-black text-gray-800">1</div>
+                <h3 class="text-xl font-bold text-white mb-2">O Cliente Clica</h3>
+                <p class="text-gray-400 text-sm">Ao invés de abrir o seu WhatsApp diretamente, o lead clica no seu link personalizado do 2chat.</p>
+            </div>
+            <div class="glass-card rounded-3xl p-8 hover-lift border-blue-500/30">
+                <div class="text-4xl mb-4 font-black text-blue-900">2</div>
+                <h3 class="text-xl font-bold text-blue-400 mb-2">Ele Responde as Regras</h3>
+                <p class="text-gray-400 text-sm">Apresentamos um formulário super rápido. Nome, interesse, e perguntas essenciais de qualificação (ex: possui convênio? qual orçamento?).</p>
+            </div>
+            <div class="glass-card rounded-3xl p-8 hover-lift">
+                <div class="text-4xl mb-4 font-black text-gray-800">3</div>
+                <h3 class="text-xl font-bold text-white mb-2">Você Recebe Tudo Pronto</h3>
+                <p class="text-gray-400 text-sm">Curiosos desistem aqui. Quem realmente quer comprar, termina de preencher e a mensagem chega no seu WhatsApp já formatada e pronta para a venda.</p>
+            </div>
+        </div>
+    </section>
 
-      <article class="glass-card rounded-2xl p-6 text-center hover-lift">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-blue-500/20 rounded-full mb-4">
-          <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-          </svg>
+    <%# Seção: Para Quem É? (Nichos e Long Tails) %>
+    <section class="bg-[#111] rounded-3xl border border-gray-800 p-8 md:p-12">
+        <h2 class="text-2xl md:text-3xl font-bold text-white mb-8 text-center">Para pequenos negócios e profissionais que não têm tempo a perder</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div>
+                <h3 class="font-bold text-white mb-2">Serviços de Alto Valor</h3>
+                <p class="text-sm text-gray-400">Corretores de imóveis, advogados e consultores. Filtre clientes que não possuem capital ou urgência antes de agendar ligações.</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-white mb-2">Alta Dependência de Orçamento</h3>
+                <p class="text-sm text-gray-400">Oficinas mecânicas, marcenarias e arquitetos. Pare de calcular estimativas cegas para clientes buscando apenas leilão de preços.</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-white mb-2">Saúde e Clínicas</h3>
+                <p class="text-sm text-gray-400">Dentistas, clínicas de estética e fisioterapia. Colete plano de saúde e sintomas antes da atendente ocupar o tempo do diagnóstico.</p>
+            </div>
+            <div>
+                <h3 class="font-bold text-white mb-2">Agências e B2B</h3>
+                <p class="text-sm text-gray-400">Gestores de tráfego, agências de marketing e empresas B2B. Receba as metas de faturamento do potencial cliente junto ao 'Olá'.</p>
+            </div>
         </div>
-        <h3 class="text-lg font-semibold text-white mb-2">Rápido</h3>
-        <p class="text-gray-400 text-sm">Qualificação em segundos, direto no WhatsApp.</p>
-      </article>
+    </section>
 
-      <article class="glass-card rounded-2xl p-6 text-center hover-lift">
-        <div class="inline-flex items-center justify-center w-12 h-12 bg-purple-500/20 rounded-full mb-4">
-          <svg class="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-          </svg>
+    <%# Seção: FAQ (Com Schema.org ativado) %>
+    <section class="max-w-3xl mx-auto space-y-8">
+        <h2 class="text-3xl font-bold text-white text-center">Perguntas Frequentes</h2>
+        
+        <div class="space-y-4">
+            <details class="glass-card rounded-2xl p-6 group cursor-pointer hover:border-gray-600 transition-colors">
+                <summary class="font-bold text-white text-lg flex justify-between items-center outline-none">
+                    Como evitar curiosos no WhatsApp Business?
+                    <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <p class="mt-4 text-gray-400 leading-relaxed">
+                    A melhor forma é usar uma triagem inteligente via link na bio ou anúncio (como o 2chat). O cliente clica, responde perguntas estruturadas (orçamento, interesse, prazo) e o sistema libera o acesso ao seu chat apenas se o lead possuir o perfil ideal.
+                </p>
+            </details>
+
+            <details class="glass-card rounded-2xl p-6 group cursor-pointer hover:border-gray-600 transition-colors">
+                <summary class="font-bold text-white text-lg flex justify-between items-center outline-none">
+                    Como passar orçamentos rápidos pelo WhatsApp?
+                    <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <p class="mt-4 text-gray-400 leading-relaxed">
+                    Ao invés de iniciar a conversa do zero, exija que o cliente preencha um formulário pré-atendimento dinâmico. Quando a mensagem chegar no seu aplicativo, ela trará todas as respostas coladas. Assim, você já abre o teclado para enviar a cotação exata.
+                </p>
+            </details>
+
+            <details class="glass-card rounded-2xl p-6 group cursor-pointer hover:border-gray-600 transition-colors">
+                <summary class="font-bold text-white text-lg flex justify-between items-center outline-none">
+                    Qual a diferença entre o 2chat e um robô de chatbot nativo?
+                    <svg class="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <p class="mt-4 text-gray-400 leading-relaxed">
+                    O 2chat opera *antes* da conversa começar (no clique do link). Isso garante 100% de confiabilidade, não exige integrações complexas (nem custa centenas de reais mensais) e evita que o seu WhatsApp Business seja bloqueado pela Meta. O lead qualificado abre a janela de conversa já com o texto da proposta em sua tela, bastando enviar para você.
+                </p>
+            </details>
         </div>
-        <h3 class="text-lg font-semibold text-white mb-2">Inteligente</h3>
-        <p class="text-gray-400 text-sm">Dados qualificados chegam organizados.</p>
-      </article>
     </section>
 
   </main>
@@ -166,26 +200,12 @@
   <%- include('../partials/footer') %>
   <%- include('../partials/cookie-banner') %>
 
-  <%# Modal de sucesso da waitlist %>
-  <div id="successModal"
-       class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden"
-       role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <%# Modal de Sucesso - Mantido %>
+  <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
     <div class="bg-gray-900 border border-gray-700 p-8 rounded-3xl max-w-sm mx-4 text-center shadow-2xl">
-      <div class="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-6"
-           aria-hidden="true">
-        <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-      </div>
-      <h2 id="modalTitle" class="text-2xl font-bold text-white mb-4">Obrigado!</h2>
-      <p class="text-gray-300 mb-6 leading-relaxed">
-        Você está na lista. Entraremos em contato em breve com novidades sobre o Beta do 2chat.
-      </p>
-      <button id="modalClose"
-              class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl transition-all">
-        Entendi
-      </button>
+      <h2 class="text-2xl font-bold text-white mb-4">Ação Registrada!</h2>
+      <p class="text-gray-300 mb-6">Em breve o time do 2chat entrará em contato para te integrar ao beta fechado.</p>
+      <button id="modalClose" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl transition-all">Entendi</button>
     </div>
   </div>
 

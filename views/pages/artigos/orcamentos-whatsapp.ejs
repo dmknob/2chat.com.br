@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../../partials/head', {
+    title, description, canonical, ogTitle, ogDesc,
+    schemaJson: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://2chat.com.br" + canonical
+      },
+      "headline": title,
+      "description": description,
+      "author": {
+        "@type": "Organization",
+        "name": "Equipe 2chat",
+        "url": "https://2chat.com.br"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "2chat",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://2chat.com.br/img/og-image.png"
+        }
+      },
+      "datePublished": "2026-04-21T00:00:00+00:00",
+      "dateModified": "2026-04-21T00:00:00+00:00"
+    })
+  }) %>
+  <style>
+    body { background: #0a0a0a; font-family: 'Inter', sans-serif; }
+    .prose h2 { color: #fff; font-size: 1.5rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
+    .prose h3 { color: #e5e5e5; font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
+    .prose p { color: #a3a3a3; line-height: 1.75; margin-bottom: 1.25rem; font-size: 1.05rem; }
+    .prose ul { color: #a3a3a3; list-style-type: disc; padding-left: 1.5rem; margin-bottom: 1.25rem; }
+    .prose li { margin-bottom: 0.5rem; }
+    .prose strong { color: #fff; }
+    .glass-card { background: rgba(17,17,17,0.8); backdrop-filter: blur(20px); border: 1px solid rgba(55,55,55,0.3); }
+  </style>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col items-center">
+
+  <nav class="w-full max-w-3xl mx-auto px-6 py-8 flex justify-between items-center border-b border-gray-800">
+      <a href="/" class="text-2xl font-extrabold text-white tracking-tight">2chat<span class="text-blue-500">.</span></a>
+      <a href="/artigos" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">← Artigos</a>
+  </nav>
+
+  <main class="w-full max-w-3xl px-6 py-12 flex-1 shrink-0">
+    
+    <header class="mb-12">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-wider mb-6">
+            Estratégia B2B / Serviços
+        </div>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-6 leading-tight">A armadilha de passar orçamentos pelo WhatsApp (E o que fazer no lugar)</h1>
+        <p class="text-xl text-gray-400 leading-relaxed">Já aconteceu de você montar um orçamento elaborado pelo WhatsApp para o cliente olhar, não responder e sumir? Veja por que isso acontece e como mudar essa dinâmica.</p>
+        
+        <div class="flex items-center gap-4 mt-8 border-t border-gray-800 pt-6">
+            <div class="text-sm text-gray-500">Publicado por <strong class="text-gray-300">Equipe 2chat</strong> • 5 min de leitura</div>
+        </div>
+    </header>
+
+    <article class="prose max-w-none">
+        <p>Você recebe uma mensagem: <strong>"Bom dia, qual o valor do projeto para minha varanda?"</strong> ou <strong>"Quanto custa fazer meu site?"</strong>. A sua vontade automática, para não perder o "lead" que parece interessado, é entregar uma estimativa rápida de preço – ou passar os próximos 30 minutos montando um PDF ou bloco de notas para enviar.</p>
+        
+        <p>Você envia. Duas marquinhas azuis. E depois, apenas o silêncio. Eles "somem". O que deu errado?</p>
+
+        <h2>Acertar no escuro e a "Síndrome do Cardápio"</h2>
+        <p>Quando você cede à pressão do "cliente" e joga o seu preço, você transformou seu serviço de alto valor em um cardápio de padaria. A partir do momento em que o cliente tem o preço em mãos, sem ter entendido o valor e sem que você entenda as necessidades dele, <strong>a única métrica de comparação restante para ele é monetária</strong>. Ele vai pegar o seu "valor" e comparar com o "valor" do concorrente. Quem cobrar 10 reais a menos, leva. O leilão das estimativas por WhatsApp mata os pequenos prestadores de serviços.</p>
+        
+        <h2>A inversão do jogo (O gatilho de Qualificação)</h2>
+        <p>A solução não é se recusar a dar orçamentos ou ser grosseiro. A solução é <strong>estruturar a entrega antes mesmo dela ser solicitada</strong>.</p>
+        
+        <p>Se o cliente precisar de um orçamento da sua empresa (oficina mecânica, marcenaria, agência, etc.), obrigue-o a descrever a necessidade. A melhor estratégia é colocar um "pedágio" logo após o clique no seu site ou Instagram:</p>
+
+        <h3>Tire o link direto do WhatsApp, adicione um formulário pré-chat</h3>
+        <p>Quando ele clica "Quero um Orçamento", ele não abre a conversa de cara para digitar "qual o preço?". Ele abre um formulário limpo, que age como seu representante. Lá ele precisa preencher:</p>
+        <ul>
+            <li>Tamanho da necessidade? (Qual a metragem, ou complexidade?)</li>
+            <li>Existe um orçamento estipulado? (Essa quebra quem busca a opção mais barata possível).</li>
+            <li>Qual é a urgência?</li>
+            <li>Detalhes essenciais.</li>
+        </ul>
+
+        <h2>Resultado duplo</h2>
+        <p><strong>1. O lead especulador (o caçador de leilão barateiro) ficará com preguiça de preencher.</strong> Ótimo. Você acabou de salvar 20 minutos do seu dia.<br>
+        <strong>2. O lead real preencherá.</strong> E quando o alerta apitar no seu celular, a mensagem que virá pelo WhatsApp será completa. Você não precisará perguntar mais nada. A sua resposta não será "custa X". A sua resposta será consultiva e ancorada nas dores que ele mesmo acabou de escrever.</p>
+        
+        <p>Qualificar, através de uma ferramenta específica de triagem, muda a percepção de autoridade do seu negócio. Você deixa de ser a pessoa que atende a qualquer um, a qualquer hora; você se torna o especialista estruturado.</p>
+    </article>
+
+    <div class="mt-12 glass-card p-8 rounded-3xl text-center">
+        <h3 class="text-2xl font-bold text-white mb-4">Crie sua barreira anticonsultor agora.</h3>
+        <p class="text-gray-400 mb-6">O 2chat é exatamente essa camada de inteligência. Crie o seu link de qualificação em menos de 1 minuto, gratuito, e só atenda quem quer comprar.</p>
+        <a href="/" class="inline-block bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-4 rounded-xl transition-all">Ver como o 2chat funciona</a>
+    </div>
+
+  </main>
+
+  <%- include('../../partials/footer') %>
+
+</body>
+</html>
