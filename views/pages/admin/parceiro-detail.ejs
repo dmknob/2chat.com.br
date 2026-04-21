@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../../partials/head', { title, description, canonical, ogTitle: title, ogDesc: description }) %>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col">
+  
+  <header class="border-b border-gray-800 bg-black sticky top-0 z-10 w-full px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-4">
+        <a href="/admin/parceiros" class="text-gray-500 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </a>
+        <div class="text-xl font-extrabold text-white">
+        2chat<span class="text-blue-500">.</span> <span class="text-gray-500 text-sm ml-2 font-medium">Editar Parceiro</span>
+        </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-5xl mx-auto p-6 space-y-12">
+    
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl text-sm font-medium mb-8">
+          <%= errorMessage %>
+      </div>
+    <% } %>
+    <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+      <div class="bg-green-500/10 border border-green-500/30 text-green-400 p-4 rounded-xl text-sm font-medium mb-8">
+          <%= successMessage %>
+      </div>
+    <% } %>
+
+    <!-- Seção 1: Configuração do Parceiro Pai -->
+    <section>
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-white mb-1"><%= parceiro.name %></h1>
+            <p class="text-gray-400 text-sm">Dados básicos da empresa e configurações globais no 2chat.</p>
+        </div>
+
+        <div class="bg-gray-900 border border-gray-800 rounded-3xl p-8 shadow-2xl">
+            <form action="/admin/parceiros/<%= parceiro.id %>/edit" method="POST" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Nome -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Nome Oficial do Parceiro</label>
+                        <input type="text" name="parceiro_name" value="<%= parceiro.name %>" required
+                            class="w-full bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-blue-500 transition-colors">
+                    </div>
+
+                    <!-- Slug -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-400 mb-2">Slug Global <span class="text-red-400 ml-1 text-xs">(Alteração Bloqueada)</span></label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500">2chat.com.br/</span>
+                            <input type="text" value="<%= parceiro.slug %>" readonly disabled
+                                class="w-full bg-[#111] border border-gray-800 text-gray-500 pl-[125px] pr-4 py-3 rounded-xl cursor-not-allowed cursor-not-allowed">
+                            <!-- Input hidden to submit the slug just in case, though usually not needed if read-only -->
+                            <input type="hidden" name="parceiro_slug" value="<%= parceiro.slug %>">
+                        </div>
+                        <p class="text-xs text-gray-600 mt-2">O slug da empresa não pode ser alterado para não quebrar links que já foram publicamente distribuídos.</p>
+                    </div>
+
+                    <!-- WhatsApp -->
+                    <div class="md:col-span-2">
+                        <label class="block text-sm font-medium text-gray-400 mb-2">WhatsApp de Destino</label>
+                        <input type="text" name="whatsapp" value="<%= parceiro.whatsapp %>" required placeholder="Ex: 5551999999999"
+                            class="w-full font-mono bg-[#0a0a0a] border border-gray-700 text-white px-4 py-3 rounded-xl focus:outline-none focus:border-blue-500 transition-colors">
+                        <p class="text-xs text-gray-500 mt-2">Todas as mensagens qualificadas (de todos os forms) irão para este número.</p>
+                    </div>
+                </div>
+
+                <div class="pt-6 border-t border-gray-800 flex items-center justify-between">
+                    <div>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" name="is_active" value="1" <%= parceiro.is_active ? 'checked' : '' %> class="w-4 h-4 rounded border-gray-700 text-blue-600 focus:ring-blue-500 bg-black">
+                            <span class="text-sm font-medium text-gray-300">Parceiro Ativo</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-8 py-3 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+                        Salvar Informações
+                    </button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <!-- Seção 2: Formulários Aninhados (1:N) -->
+    <section>
+        <div class="flex justify-between items-end mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-white mb-1">Canais de Qualificação (Forms)</h2>
+                <p class="text-gray-400 text-sm">Links de formulário subordinados a este parceiro.</p>
+            </div>
+            <div>
+                <a href="/admin/parceiros/<%= parceiro.id %>/forms/new" class="bg-gray-800 hover:bg-gray-700 text-white font-bold px-4 py-2 rounded-xl transition-colors flex items-center gap-2 text-sm border border-gray-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+                    Criar Novo Form
+                </a>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 border border-gray-800 rounded-3xl overflow-hidden shadow-2xl">
+            <div class="overflow-x-auto w-full">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                <tr class="bg-black/50 text-gray-500 text-xs uppercase tracking-wider">
+                    <th class="p-4 font-medium min-w-[200px]">Título do Formulário</th>
+                    <th class="p-4 font-medium">Link Completo</th>
+                    <th class="p-4 font-medium text-center">Status</th>
+                    <th class="p-4 font-medium text-right">Ação</th>
+                </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-gray-800">
+                <% if (!forms || forms.length === 0) { %>
+                    <tr>
+                    <td colspan="4" class="p-8 text-center text-gray-500">
+                        Nenhum formulário qualificador associado.<br>
+                        <a href="/admin/parceiros/<%= parceiro.id %>/forms/new" class="text-blue-400 hover:underline mt-2 inline-block">Criar o primeiro</a>
+                    </td>
+                    </tr>
+                <% } else { %>
+                    <% forms.forEach(f => { %>
+                    <tr class="hover:bg-gray-800/50 transition-colors group">
+                        <td class="p-4">
+                            <div class="font-bold text-white"><%= f.title %></div>
+                            <div class="text-xs text-gray-500 truncate max-w-[250px]"><%= f.description || 'Sem descrição' %></div>
+                        </td>
+                        <td class="p-4 font-mono text-xs text-gray-400">
+                            2chat.com.br/<%= parceiro.slug %>/<%= f.slug %>
+                        </td>
+                        <td class="p-4 text-center">
+                            <% if (f.is_active) { %>
+                                <span class="bg-green-500/10 text-green-400 px-2 py-1 rounded text-xs font-medium border border-green-500/20">Ativo</span>
+                            <% } else { %>
+                                <span class="bg-red-500/10 text-red-400 px-2 py-1 rounded text-xs font-medium border border-red-500/20">Inativo</span>
+                            <% } %>
+                        </td>
+                        <td class="p-4 text-right">
+                            <a href="/admin/parceiros/<%= parceiro.id %>/forms/<%= f.id %>/edit" class="text-blue-500 hover:text-blue-400 transition-colors font-medium">
+                                Editar Qualificação
+                            </a>
+                        </td>
+                    </tr>
+                    <% }) %>
+                <% } %>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </section>
+
+  </main>
+</body>
+</html>

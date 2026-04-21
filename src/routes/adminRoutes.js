@@ -104,6 +104,26 @@ router.get('/hub', requireAuth, (req, res) => {
 });
 
 // =============================================================================
+// GET /admin/parceiros (Lista Mestre de Parceiros)
+// =============================================================================
+router.get('/parceiros', requireAuth, (req, res) => {
+    const list = db.prepare(`
+        SELECT p.*, COUNT(f.id) as forms_count 
+        FROM parceiros p 
+        LEFT JOIN forms f ON f.parceiro_id = p.id 
+        GROUP BY p.id 
+        ORDER BY p.name ASC
+    `).all();
+
+    res.render('pages/admin/parceiros', {
+        title: 'Gerenciar Parceiros',
+        description: 'Lista de inquilinos e seus múltiplos links de formulário.',
+        canonical: '/admin/parceiros',
+        list
+    });
+});
+
+// =============================================================================
 // GET /admin/waitlist (Lista de Alfas/Waitlist)
 // =============================================================================
 router.get('/waitlist', requireAuth, (req, res) => {
@@ -151,9 +171,82 @@ router.get('/leads/:id', requireAuth, (req, res) => {
 });
 
 // =============================================================================
-// GET /admin/parceiros/new (Formulário Visual de Criação)
+// GET /admin/parceiros/:id (Detalhes do Parceiro + Lista de Forms)
+// =============================================================================
+router.get('/parceiros/:id', requireAuth, (req, res) => {
+    const { id } = req.params;
+    if (id === 'new') return next(); // Fallback para a rota /new
+
+    const parceiro = db.prepare('SELECT * FROM parceiros WHERE id = ?').get(id);
+    if (!parceiro) {
+        req.session.error = 'Parceiro não encontrado.';
+        return res.redirect('/admin/parceiros');
+    }
+
+    const forms = db.prepare('SELECT * FROM forms WHERE parceiro_id = ? ORDER BY id ASC').all(id);
+
+    res.render('pages/admin/parceiro-detail', {
+        title: `Parceiro: ${parceiro.name}`,
+        description: 'Gerencie campos globais e links de qualificação',
+        canonical: `/admin/parceiros/${id}`,
+        parceiro,
+        forms,
+        errorMessage: req.session.error || null,
+        successMessage: req.session.success || null
+    });
+
+    if (req.session) {
+        req.session.error = null;
+        req.session.success = null;
+    }
+});
+
+// =============================================================================
+// POST /admin/parceiros/:id/edit (Gravar Edição Básica)
+// =============================================================================
+router.post('/parceiros/:id/edit', requireAuth, async (req, res) => {
+    const { id } = req.params;
+    const { parceiro_name, whatsapp, is_active } = req.body;
+    const activeFlag = is_active ? 1 : 0;
+
+    try {
+        const parceiro = db.prepare('SELECT slug FROM parceiros WHERE id = ?').get(id);
+        if (!parceiro) throw new Error('Parceiro não existe');
+
+        db.prepare('UPDATE parceiros SET name = ?, whatsapp = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?')
+          .run(parceiro_name, whatsapp, activeFlag, id);
+
+        // Se atualizar algo master, empurra a árvore toda pro KV novamente
+        await kvSync.publishParceiroToKV(parceiro.slug);
+
+        req.session.success = 'Parceiro atualizado e sincronizado com Cloudflare.';
+    } catch (err) {
+        logger.error('Erro atualizar parceiro', err);
+        req.session.error = err.message;
+    }
+
+    res.redirect(`/admin/parceiros/${id}`);
+});
+
+// =============================================================================
+// POST /admin/parceiros/:slug/sync (Sync Force Manual)
+// =============================================================================
+router.post('/parceiros/:slug/sync', requireAuth, async (req, res) => {
+    try {
+        await kvSync.publishParceiroToKV(req.params.slug);
+        logger.info(`Sincronia manual forçada para ${req.params.slug}`);
+    } catch (err) {
+        logger.error('Erro Forçar Sincronia', err);
+    }
+    // Independente do erro ou acerto, volta pra lista
+    res.redirect('/admin/parceiros');
+});
+
+// =============================================================================
+// GET /admin/parceiros/new (Formulário Visual de Criação DB Master)
 // =============================================================================
 router.get('/parceiros/new', requireAuth, (req, res) => {
+    // Reutilizando view simplificada (que precisará ser editada depois para remover campos de form)
     res.render('pages/admin/new-parceiro', {
         title: 'Criar Parceiro',
         description: 'Adicionar nova empresa ao 2chat',
@@ -164,60 +257,148 @@ router.get('/parceiros/new', requireAuth, (req, res) => {
 });
 
 // =============================================================================
-// POST /admin/parceiros/new (Processamento e Sync CF)
+// POST /admin/parceiros/new (Processamento e Redirecionamento)
 // =============================================================================
 router.post('/parceiros/new', requireAuth, async (req, res) => {
-    const { parceiro_name, parceiro_slug, whatsapp, form_title, form_slug, form_description, message_template, fields_json } = req.body;
+    // Agora aceitamos apenas dados master na criação primária
+    const { parceiro_name, parceiro_slug, whatsapp } = req.body;
 
     try {
-        // Valida JSON
-        let parsedFields;
-        try {
-            parsedFields = JSON.parse(fields_json);
-            if (!Array.isArray(parsedFields)) throw new Error('Schema de campos precisa ser um Array [ ]');
-        } catch (jErr) {
-            req.session.error = 'Erro no Schema JSON dos Campos: ' + jErr.message;
-            return res.redirect('/admin/parceiros/new');
-        }
+        const insertInfo = db.prepare(`
+            INSERT INTO parceiros (slug, name, whatsapp, plan)
+            VALUES (?, ?, ?, 'free')
+        `).run(parceiro_slug, parceiro_name, whatsapp);
 
-        // Transação no SQLite
-        db.transaction(() => {
-            // Insere Parceiro
-            const parceiroStmt = db.prepare(`
-                INSERT OR IGNORE INTO parceiros (slug, name, whatsapp, plan)
-                VALUES (?, ?, ?, 'free')
-            `);
-            parceiroStmt.run(parceiro_slug, parceiro_name, whatsapp);
-
-            const parceiro = db.prepare('SELECT id FROM parceiros WHERE slug = ?').get(parceiro_slug);
-
-            // Insere Form
-            const formStmt = db.prepare(`
-                INSERT OR IGNORE INTO forms
-                (parceiro_id, slug, title, description, fields_json, message_template)
-                VALUES (?, ?, ?, ?, ?, ?)
-            `);
-            formStmt.run(
-                parceiro.id,
-                form_slug,
-                form_title,
-                form_description || '',
-                JSON.stringify(parsedFields),
-                message_template
-            );
-        })();
-
-        // Sincroniza com a Cloudflare (Worker)
-        await kvSync.publishParceiroToKV(parceiro_slug);
-
-        logger.info(`Novo Parceiro Criado & Sincronizado: ${parceiro_slug}`);
-        res.redirect('/admin/hub');
-
+        // Não faz Sync ainda pq não tem Form. Redireciona pra página dele.
+        res.redirect(`/admin/parceiros/${insertInfo.lastInsertRowid}`);
     } catch (err) {
         logger.error('Erro ao salvar UI Parceiro', { error: err.message });
         req.session.error = 'Falha ao salvar. Verifique se o slug já existe. Erro: ' + err.message;
         res.redirect('/admin/parceiros/new');
     }
+});
+
+// =============================================================================
+// GET /admin/parceiros/:id/forms/new
+// =============================================================================
+router.get('/parceiros/:id/forms/new', requireAuth, (req, res) => {
+    const parceiro = db.prepare('SELECT id, name, slug FROM parceiros WHERE id = ?').get(req.params.id);
+    if (!parceiro) return res.redirect('/admin/parceiros');
+
+    res.render('pages/admin/form-edit', {
+        title: 'Criar Novo Formulário',
+        description: 'Adicionar canal de qualificação',
+        canonical: '',
+        parceiro,
+        errorMessage: req.session.error || null
+    });
+    if (req.session) req.session.error = null;
+});
+
+// =============================================================================
+// POST /admin/parceiros/:id/forms/new
+// =============================================================================
+router.post('/parceiros/:id/forms/new', requireAuth, async (req, res) => {
+    const { id } = req.params;
+    const { title, slug, description, fields_json, message_template } = req.body;
+
+    try {
+        const parceiro = db.prepare('SELECT id, slug FROM parceiros WHERE id = ?').get(id);
+        if (!parceiro) throw new Error('Parceiro pai não encontrado');
+
+        // Validar Json
+        let parsedFields;
+        try {
+            parsedFields = JSON.parse(fields_json);
+            if (!Array.isArray(parsedFields)) throw new Error('O schema JSON precisa ser um Array válido [ ]');
+        } catch(jsonErr) {
+            req.session.error = 'Erro na sintaxe JSON: ' + jsonErr.message;
+            return res.redirect(`/admin/parceiros/${id}/forms/new`);
+        }
+
+        db.prepare(`
+            INSERT INTO forms (parceiro_id, slug, title, description, fields_json, message_template)
+            VALUES (?, ?, ?, ?, ?, ?)
+        `).run(parceiro.id, slug, title, description || '', JSON.stringify(parsedFields), message_template);
+
+        // Sync automático de todo o parceiro (KV envia objeto completo)
+        await kvSync.publishParceiroToKV(parceiro.slug);
+        
+        req.session.success = 'Formulário criado com sucesso e sincronizado no KV.';
+        res.redirect(`/admin/parceiros/${id}`);
+    } catch (err) {
+        logger.error('Erro criar form', err);
+        req.session.error = err.message;
+        res.redirect(`/admin/parceiros/${id}/forms/new`);
+    }
+});
+
+// =============================================================================
+// GET /admin/parceiros/:id/forms/:form_id/edit
+// =============================================================================
+router.get('/parceiros/:id/forms/:form_id/edit', requireAuth, (req, res) => {
+    const { id, form_id } = req.params;
+    const parceiro = db.prepare('SELECT id, name, slug FROM parceiros WHERE id = ?').get(id);
+    const form = db.prepare('SELECT * FROM forms WHERE id = ? AND parceiro_id = ?').get(form_id, id);
+
+    if (!parceiro || !form) return res.redirect(`/admin/parceiros/${id}`);
+
+    res.render('pages/admin/form-edit', {
+        title: 'Editar Formulário',
+        description: 'Alterar regras de qualificação de leads',
+        canonical: '',
+        parceiro,
+        form: { ...form, fields_json: form.fields_json }, // Fields já é string JSON no banco
+        errorMessage: req.session.error || null
+    });
+    if (req.session) req.session.error = null;
+});
+
+// =============================================================================
+// POST /admin/parceiros/:id/forms/:form_id/edit
+// =============================================================================
+router.post('/parceiros/:id/forms/:form_id/edit', requireAuth, async (req, res) => {
+    const { id, form_id } = req.params;
+    const { title, description, fields_json, message_template, is_active } = req.body;
+    let { slug } = req.body; // Slug *pode* vir caso não seja bloqueado
+
+    try {
+        const parceiro = db.prepare('SELECT id, slug FROM parceiros WHERE id = ?').get(id);
+        const formTarget = db.prepare('SELECT slug_locked, slug FROM forms WHERE id = ?').get(form_id);
+        
+        if (!parceiro || !formTarget) throw new Error('Parceiro ou formulário inexistente');
+
+        // Impede mudança de slug se ele estiver bloqueado (por já ter leads)
+        if (formTarget.slug_locked) {
+            slug = formTarget.slug;
+        }
+
+        let parsedFields;
+        try {
+            parsedFields = JSON.parse(fields_json);
+            if (!Array.isArray(parsedFields)) throw new Error('O schema JSON precisa ser um Array válido [ ]');
+        } catch(jsonErr) {
+            req.session.error = 'Erro na sintaxe JSON: ' + jsonErr.message;
+            return res.redirect(`/admin/parceiros/${id}/forms/${form_id}/edit`);
+        }
+
+        db.prepare(`
+            UPDATE forms 
+            SET title = ?, slug = ?, description = ?, fields_json = ?, message_template = ?, is_active = ?, updated_at = CURRENT_TIMESTAMP
+            WHERE id = ? AND parceiro_id = ?
+        `).run(title, slug, description || '', JSON.stringify(parsedFields), message_template, is_active ? 1 : 0, form_id, id);
+
+        // Sync Automático Edge
+        await kvSync.publishParceiroToKV(parceiro.slug);
+
+        req.session.success = 'Formulário atualizado e Edge Sincronizado.';
+    } catch (err) {
+        logger.error('Erro atualizar form', err);
+        req.session.error = err.message;
+        return res.redirect(`/admin/parceiros/${id}/forms/${form_id}/edit`);
+    }
+    
+    res.redirect(`/admin/parceiros/${id}`);
 });
 
 module.exports = router;

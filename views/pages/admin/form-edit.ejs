@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <%- include('../../partials/head', { title, description, canonical, ogTitle: title, ogDesc: description }) %>
+</head>
+<body class="bg-[#0a0a0a] text-gray-200 min-h-screen flex flex-col">
+  
+  <header class="border-b border-gray-800 bg-black sticky top-0 z-10 w-full px-6 py-4 flex justify-between items-center">
+    <div class="flex items-center gap-4">
+        <a href="/admin/parceiros/<%= parceiro.id %>" class="text-gray-500 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </a>
+        <div class="text-xl font-extrabold text-white">
+        2chat<span class="text-blue-500">.</span> 
+        <span class="text-gray-500 text-sm ml-2 font-medium">
+            <%= parceiro.name %> > <%= typeof form !== 'undefined' ? form.slug : 'Novo Link' %>
+        </span>
+        </div>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full max-w-4xl mx-auto p-6 space-y-8">
+    
+    <div class="mb-4">
+      <h1 class="text-2xl font-bold text-white"><%= typeof form !== 'undefined' ? 'Editar Formulário de Qualificação' : 'Criar Novo Formulário' %></h1>
+      <p class="text-gray-400 text-sm mt-1">Isso afetará como os leads são filtrados antes de chegar no WhatsApp do parceiro.</p>
+    </div>
+
+    <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+      <div class="bg-red-500/10 border border-red-500/40 text-red-400 p-4 rounded-xl text-sm font-medium text-center">
+        <%= errorMessage %>
+      </div>
+    <% } %>
+
+    <form action="<%= typeof form !== 'undefined' ? `/admin/parceiros/${parceiro.id}/forms/${form.id}/edit` : `/admin/parceiros/${parceiro.id}/forms/new` %>" method="POST" class="space-y-6 bg-gray-900 border border-gray-800 p-6 sm:p-8 rounded-3xl shadow-xl">
+      
+      <!-- Dados do Formulário -->
+      <section>
+        <div class="flex justify-between items-center border-b border-gray-800 pb-2 mb-4">
+            <h2 class="text-lg font-semibold text-white">1. Link e Configurações Públicas</h2>
+            <% if (typeof form !== 'undefined') { %>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="is_active" value="1" <%= form.is_active ? 'checked' : '' %> class="w-4 h-4 rounded border-gray-700 text-blue-600 bg-black">
+                    <span class="text-xs font-medium text-gray-400">Ativo</span>
+                </label>
+            <% } %>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Título Público (H1)</label>
+            <input type="text" name="title" value="<%= typeof form !== 'undefined' ? form.title : '' %>" required placeholder="Ex: Solicite um Orçamento"
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-1">Slug Diferenciador (URL)</label>
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-500">/<%= parceiro.slug %>/</span>
+                <% if (typeof form !== 'undefined' && form.slug_locked) { %>
+                    <!-- Se tiver leads (ou for edição normal em MVP v1 travado), pode bloquear a troca pro link n quebrar -->
+                    <input type="text" value="<%= form.slug %>" readonly class="w-full bg-[#111] text-gray-500 border border-gray-800 cursor-not-allowed pl-[135px] pr-4 py-3 rounded-xl">
+                    <input type="hidden" name="slug" value="<%= form.slug %>">
+                <% } else { %>
+                    <input type="text" name="slug" value="<%= typeof form !== 'undefined' ? form.slug : '' %>" required placeholder="Ex: site-saas"
+                        class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 pl-[135px] pr-4 py-3 rounded-xl focus:outline-none focus:border-blue-500 transition-colors">
+                <% } %>
+            </div>
+            <% if (typeof form !== 'undefined' && form.slug_locked) { %>
+                <p class="text-xs text-red-500/70 mt-1">Este slug foi trancado (já recebeu tráfego) e não pode ser editado.</p>
+            <% } %>
+          </div>
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-300 mb-1">Descrição (Apoio visual)</label>
+            <input type="text" name="description" value="<%= (typeof form !== 'undefined' && form.description) ? form.description : '' %>" placeholder="Ex: Preencha os dados primários para que nosso consultor analise sua mesa."
+                   class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors">
+          </div>
+        </div>
+      </section>
+
+      <!-- Campos Dinâmicos -->
+      <section>
+        <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white mt-8">2. Condições de Triagem Genéricas (Schema)</h2>
+        <div>
+          <textarea name="fields_json" rows="10" required spellcheck="false" class="w-full bg-gray-800 border border-gray-700 text-green-400 placeholder-gray-500 p-4 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 font-mono text-xs transition-colors"><%= typeof form !== 'undefined' ? form.fields_json : '[\n  {\n    "id": "name",\n    "label": "Qual o seu nome?",\n    "type": "text",\n    "placeholder": "Seu nome",\n    "required": true\n  }\n]' %></textarea>
+          <p class="text-xs text-gray-500 mt-1">Certifique-se de que é um formato válido de JSON Array.</p>
+        </div>
+      </section>
+
+      <!-- Template WhatsApp -->
+      <section>
+        <h2 class="text-lg font-semibold border-b border-gray-800 pb-2 mb-4 text-white mt-8">3. Template Final do WhatsApp</h2>
+        <div>
+            <textarea name="message_template" rows="4" required placeholder="Ex: Olá! Meu nome é {{name}} e eu vim pelo site."
+                class="w-full bg-gray-800 border border-gray-700 text-gray-100 placeholder-gray-500 p-3 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 transition-colors"><%= typeof form !== 'undefined' ? form.message_template : 'Olá! Meu nome é {{name}} e vim pelo seu link.' %></textarea>
+            <p class="text-xs text-blue-400 mt-1">Substitua as respostas do JSON usando o ID em chaves triplas como <code>{{name}}</code> ou <code>{{orcamento}}</code>.</p>
+        </div>
+      </section>
+
+      <div class="pt-4 border-t border-gray-800 flex justify-between items-center">
+        <div>
+            <% if (typeof form !== 'undefined') { %>
+                <a href="/admin/parceiros/<%= parceiro.id %>" class="text-gray-400 hover:text-white transition-colors text-sm">Cancelar</a>
+            <% } %>
+        </div>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.2)]">
+          <%= typeof form !== 'undefined' ? 'Salvar Configurações' : 'Criar Formulário' %>
+        </button>
+      </div>
+
+    </form>
+  </main>
+
+  <%- include('../../partials/footer') %>
+</body>
+</html>
