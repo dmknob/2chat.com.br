@@ -476,6 +476,8 @@ function renderForm(parceiro, form, { error = null, values = {} } = {}) {
             autocomplete = `autocomplete="tel"`;
         } else if (field.id === 'email' || field.type === 'email') {
             autocomplete = `autocomplete="email"`;
+        } else if (field.id === 'cidade' || field.id === 'city') {
+            autocomplete = `autocomplete="address-level2"`;
         }
         
         // Se o id for whatsapp, sugerimos o type="tel" para abrir o teclado numérico
