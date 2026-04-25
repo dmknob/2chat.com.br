@@ -173,7 +173,7 @@ router.get('/leads/:id', requireAuth, (req, res) => {
 // =============================================================================
 // GET /admin/parceiros/:id (Detalhes do Parceiro + Lista de Forms)
 // =============================================================================
-router.get('/parceiros/:id', requireAuth, (req, res) => {
+router.get('/parceiros/:id', requireAuth, (req, res, next) => {
     const { id } = req.params;
     if (id === 'new') return next(); // Fallback para a rota /new
 

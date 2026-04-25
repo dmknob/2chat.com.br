@@ -466,7 +466,22 @@ function renderForm(parceiro, form, { error = null, values = {} } = {}) {
       const fieldTitle = `<div><label for="${field.id}" class="block text-sm font-medium text-gray-300 mb-2">${field.label}${field.required ? ' <span class="text-red-500">*</span>' : ""}</label>`;
 
       if (field.type === "text") {
-        return `${fieldTitle}<input id="${field.id}" name="${field.id}" type="text" placeholder="${field.placeholder ?? ""}" value="${escHtml(val)}" ${field.required ? "required" : ""} class="${fieldClass}"></div>`;
+        // Inteligência para autocomplete em mobile (melhora drástica de conversão)
+        let autocomplete = "";
+        if (field.autocomplete) {
+            autocomplete = `autocomplete="${escHtml(field.autocomplete)}"`;
+        } else if (field.id === 'nome' || field.id === 'name') {
+            autocomplete = `autocomplete="name"`;
+        } else if (field.id === 'whatsapp' || field.id === 'telefone' || field.id === 'phone' || field.type === 'tel') {
+            autocomplete = `autocomplete="tel"`;
+        } else if (field.id === 'email' || field.type === 'email') {
+            autocomplete = `autocomplete="email"`;
+        }
+        
+        // Se o id for whatsapp, sugerimos o type="tel" para abrir o teclado numérico
+        const inputType = (field.id === 'whatsapp' || field.id === 'telefone' || field.type === 'tel') ? 'tel' : 'text';
+
+        return `${fieldTitle}<input id="${field.id}" name="${field.id}" type="${inputType}" placeholder="${field.placeholder ?? ""}" value="${escHtml(val)}" ${autocomplete} ${field.required ? "required" : ""} class="${fieldClass}"></div>`;
       }
 
       if (field.type === "select") {
