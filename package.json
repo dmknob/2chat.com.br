@@ -10,7 +10,7 @@
     "build:css": "tailwindcss -i ./src/input.css -o ./public/css/style.css --minify",
     "watch:css": "tailwindcss -i ./src/input.css -o ./public/css/style.css --watch",
     "db:setup": "node database/setup-db.js",
-    "db:seed": "node scripts/seed-zebra-box.js",
+    "db:seed": "node scripts/seed-db.js",
     "db:reset": "node scripts/reset-db.js",
     "db:dump": "node scripts/dump-db.js",
     "db:restore": "node scripts/restore-db.js",

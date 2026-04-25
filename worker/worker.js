@@ -465,7 +465,7 @@ function renderForm(parceiro, form, { error = null, values = {} } = {}) {
       const val = values[field.id] ?? "";
       const fieldTitle = `<div><label for="${field.id}" class="block text-sm font-medium text-gray-300 mb-2">${field.label}${field.required ? ' <span class="text-red-500">*</span>' : ""}</label>`;
 
-      if (field.type === "text") {
+      if (field.type === "text" || field.type === "date" || field.type === "time" || field.type === "datetime-local") {
         // Inteligência para autocomplete em mobile (melhora drástica de conversão)
         let autocomplete = "";
         if (field.autocomplete) {
@@ -480,10 +480,17 @@ function renderForm(parceiro, form, { error = null, values = {} } = {}) {
             autocomplete = `autocomplete="address-level2"`;
         }
         
-        // Se o id for whatsapp, sugerimos o type="tel" para abrir o teclado numérico
-        const inputType = (field.id === 'whatsapp' || field.id === 'telefone' || field.type === 'tel') ? 'tel' : 'text';
+        // Mantemos o tipo original, a menos que a inferência force 'tel'
+        let inputType = field.type;
+        if (field.id === 'whatsapp' || field.id === 'telefone' || field.type === 'tel') {
+            inputType = 'tel';
+        }
 
         return `${fieldTitle}<input id="${field.id}" name="${field.id}" type="${inputType}" placeholder="${field.placeholder ?? ""}" value="${escHtml(val)}" ${autocomplete} ${field.required ? "required" : ""} class="${fieldClass}"></div>`;
+      }
+
+      if (field.type === "textarea") {
+          return `${fieldTitle}<textarea id="${field.id}" name="${field.id}" placeholder="${field.placeholder ?? ""}" ${field.required ? "required" : ""} rows="4" class="${fieldClass}" style="resize: vertical;">${escHtml(val)}</textarea></div>`;
       }
 
       if (field.type === "select") {
