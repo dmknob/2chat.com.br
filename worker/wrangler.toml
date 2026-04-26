@@ -21,10 +21,10 @@ binding    = "2CHAT_LEADS_KV"
 id         = "3408aa729e1e40e497db872ad9380905"
 # preview_id = "COLE_O_PREVIEW_ID_AQUI"  # descomente se usar wrangler dev
 
-# PARCEIROS_KV: configuração de parceiros (ativar na v1)
-# [[kv_namespaces]]
-# binding    = "_2CHAT_PARCEIROS_KV"
-# id         = "c3e1daa6cec446b5bc6c2b58353abc16"
+# TENANTS_KV: configuração de parceiros (ativar na v1)
+[[kv_namespaces]]
+binding    = "TENANTS_KV"
+id         = "c3e1daa6cec446b5bc6c2b58353abc16"
 
 # ===========================================================
 # Rotas: Worker intercepta TUDO em 2chat.com.br/*

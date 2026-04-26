@@ -1,7 +1,7 @@
 // src/services/kvSync.js
 // Publica configuração de parceiro do SQLite → Cloudflare KV (TENANTS_KV)
 // Chamado manualmente (CLI) ou pelo painel admin (v1)
-const db     = require('../../database/db');
+const db = require('../../database/db');
 const logger = require('../logger');
 
 /**
@@ -12,9 +12,9 @@ const logger = require('../logger');
  * @returns {Object} - Config JSON publicada no KV
  */
 async function publishParceiroToKV(slug) {
-    const CF_ACCOUNT_ID      = process.env.CF_ACCOUNT_ID;
-    const CF_API_TOKEN       = process.env.CF_API_TOKEN;
-    const KV_TENANTS_NS_ID   = process.env.KV_TENANTS_NAMESPACE_ID;
+    const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
+    const CF_API_TOKEN = process.env.CF_KV_API_TOKEN;
+    const KV_TENANTS_NS_ID = process.env.KV_TENANTS_NAMESPACE_ID;
 
     if (!CF_ACCOUNT_ID || !CF_API_TOKEN || !KV_TENANTS_NS_ID) {
         throw new Error(
@@ -37,16 +37,16 @@ async function publishParceiroToKV(slug) {
 
     // Monta o JSON de configuração que o Worker vai ler do KV
     const kvConfig = {
-        slug:     parceiro.slug,
-        name:     parceiro.name,
+        slug: parceiro.slug,
+        name: parceiro.name,
         whatsapp: parceiro.whatsapp,          // sempre string (corpo-digital §1.4)
-        forms:    Object.fromEntries(forms.map(f => [
+        forms: Object.fromEntries(forms.map(f => [
             f.slug,
             {
-                id:               f.slug,
-                title:            f.title,
-                description:      f.description ?? '',
-                fields:           JSON.parse(f.fields_json),
+                id: f.slug,
+                title: f.title,
+                description: f.description ?? '',
+                fields: JSON.parse(f.fields_json),
                 message_template: f.message_template,
             }
         ])),
@@ -65,10 +65,10 @@ async function publishParceiroToKV(slug) {
 
     while (retries > 0) {
         res = await fetch(kvUrl, {
-            method:  'PUT',
+            method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${CF_API_TOKEN}`,
-                'Content-Type':  'application/json',
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(kvConfig),
         });
@@ -89,7 +89,7 @@ async function publishParceiroToKV(slug) {
     if (!res.ok) {
         const bodyText = await res.text();
         if (res.status === 429) {
-             throw new Error(`Cloudflare Rate Limit (Erro 1015). Limite global da sua conta Cloudflare estourou. Os dados foram salvos no banco local SQLite, mas a sincronia falhou. Aguarde 5 minutos e edite o parceiro para retentar.`);
+            throw new Error(`Cloudflare Rate Limit (Erro 1015). Limite global da sua conta Cloudflare estourou. Os dados foram salvos no banco local SQLite, mas a sincronia falhou. Aguarde 5 minutos e edite o parceiro para retentar.`);
         }
         throw new Error(`Cloudflare KV API respondeu ${res.status}: ${bodyText.substring(0, 150)}...`);
     }
@@ -103,8 +103,8 @@ async function publishParceiroToKV(slug) {
  * @param {string} slug
  */
 async function removeParceiroFromKV(slug) {
-    const CF_ACCOUNT_ID    = process.env.CF_ACCOUNT_ID;
-    const CF_API_TOKEN     = process.env.CF_API_TOKEN;
+    const CF_ACCOUNT_ID = process.env.CF_ACCOUNT_ID;
+    const CF_API_TOKEN = process.env.CF_API_TOKEN;
     const KV_TENANTS_NS_ID = process.env.KV_TENANTS_NAMESPACE_ID;
 
     const kvUrl = [
@@ -114,7 +114,7 @@ async function removeParceiroFromKV(slug) {
     ].join('');
 
     await fetch(kvUrl, {
-        method:  'DELETE',
+        method: 'DELETE',
         headers: { 'Authorization': `Bearer ${CF_API_TOKEN}` },
     });
 

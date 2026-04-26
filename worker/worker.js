@@ -465,7 +465,7 @@ function renderForm(parceiro, form, { error = null, values = {} } = {}) {
       const val = values[field.id] ?? "";
       const fieldTitle = `<div><label for="${field.id}" class="block text-sm font-medium text-gray-300 mb-2">${field.label}${field.required ? ' <span class="text-red-500">*</span>' : ""}</label>`;
 
-      if (field.type === "text" || field.type === "date" || field.type === "time" || field.type === "datetime-local") {
+      if (field.type === "text" || field.type === "tel" || field.type === "email" || field.type === "date" || field.type === "time" || field.type === "datetime-local") {
         // Inteligência para autocomplete em mobile (melhora drástica de conversão)
         let autocomplete = "";
         if (field.autocomplete) {
